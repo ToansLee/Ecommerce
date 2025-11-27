@@ -1,0 +1,125 @@
+@model ECommerceMVC.Models.Restaurant
+@{
+	ViewData["Title"] = "Dashboard";
+	Layout = "~/Views/Shared/_LayoutSeller.cshtml";
+}
+
+<div class="container-fluid py-5" style="background: linear-gradient(to bottom, #FFF8F0 0%, #FFFFFF 100%);">
+	<div class="container py-5">
+		<!-- Welcome Section -->
+		<div class="row mb-4">
+			<div class="col-12">
+				<h2 style="color: #FF9500; font-weight: 700;">
+					<i class="fas fa-chart-line me-2"></i>Dashboard - @ViewBag.RestaurantName
+				</h2>
+				<p style="color: #6C757D;">Tổng quan kinh doanh của bạn</p>
+			</div>
+		</div>
+
+		<!-- Statistics Cards -->
+		<div class="row g-4 mb-5">
+			<div class="col-md-4">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px; background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%);">
+				<div class="card-body p-4 text-white">
+					<div class="d-flex justify-content-between align-items-center">
+						<div>
+							<p class="mb-1" style="opacity: 0.9;">Tổng món ăn</p>
+							<h2 class="mb-0" style="font-weight: 700;">@ViewBag.TotalMenuItems</h2>
+							</div>
+							<i class="fas fa-utensils fa-3x" style="opacity: 0.3;"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+				<div class="card-body p-4 text-white">
+					<div class="d-flex justify-content-between align-items-center">
+						<div>
+							<p class="mb-1" style="opacity: 0.9;">Tổng đơn hàng</p>
+							<h2 class="mb-0" style="font-weight: 700;">@ViewBag.TotalOrders</h2>
+							</div>
+							<i class="fas fa-shopping-cart fa-3x" style="opacity: 0.3;"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px; background: linear-gradient(135deg, #6f42c1 0%, #b537f2 100%);">
+				<div class="card-body p-4 text-white">
+					<div class="d-flex justify-content-between align-items-center">
+						<div>
+							<p class="mb-1" style="opacity: 0.9;">Tổng doanh thu</p>
+							<h2 class="mb-0" style="font-weight: 700;">@string.Format("{0:N0}đ", ViewBag.TotalRevenue)</h2>
+							</div>
+							<i class="fas fa-dollar-sign fa-3x" style="opacity: 0.3;"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Quick Actions -->
+		<div class="row mb-5">
+			<div class="col-12">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px;">
+				<div class="card-body p-4">
+					<h5 class="mb-4" style="color: #FF9500; font-weight: 600;">
+						<i class="fas fa-bolt me-2"></i>Thao tác nhanh
+					</h5>
+						<div class="row g-3">
+						<div class="col-md-3">
+							<a asp-action="CreateMenuItem" class="btn btn-lg w-100" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); color: white; border-radius: 10px; border: none;">
+								<i class="fas fa-plus-circle me-2"></i>Thêm món mới
+							</a>
+							</div>
+						<div class="col-md-3">
+							<a asp-action="MenuItems" class="btn btn-lg w-100" style="background: white; color: #FF9500; border: 2px solid #FF9500; border-radius: 10px;">
+								<i class="fas fa-list me-2"></i>Xem món ăn
+							</a>
+							</div>
+							<div class="col-md-3">
+								<a asp-action="Revenue" class="btn btn-lg w-100" style="background: white; color: #FF9500; border: 2px solid #FF9500; border-radius: 10px;">
+									<i class="fas fa-chart-bar me-2"></i>Xem doanh thu
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Restaurant Info -->
+		<div class="row">
+			<div class="col-12">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px;">
+				<div class="card-body p-4">
+					<h5 class="mb-4" style="color: #FF9500; font-weight: 600;">
+						<i class="fas fa-store me-2"></i>Thông tin nhà hàng
+					</h5>
+					<div class="row">
+						<div class="col-md-6">
+							<p><strong>Tên nhà hàng:</strong> @Model.Name</p>
+							<p><strong>Địa chỉ:</strong> @Model.Address</p>
+							<p><strong>Số điện thoại:</strong> @Model.Phone</p>
+							</div>
+							<div class="col-md-6">
+								<p><strong>Tráº¡ng thÃ¡i:</strong> 
+									@if (Model.IsActive)
+									{
+										<span class="badge bg-success">Äang hoáº¡t Ä‘á»™ng</span>
+									}
+									else
+									{
+										<span class="badge bg-danger">Táº¡m ngÆ°ng</span>
+									}
+								</p>
+								<p><strong>NgÃ y táº¡o:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

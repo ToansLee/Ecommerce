@@ -1,0 +1,76 @@
+@model List<ECommerceMVC.Models.Order>
+@{
+    ViewData["Title"] = "Quáº£n lÃ½ Ä‘Æ¡n hÃ ng";
+    Layout = "_LayoutSeller";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: #FF9500;"><i class="fas fa-receipt me-2"></i>Quáº£n lÃ½ Ä‘Æ¡n hÃ ng</h2>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-receipt" style="font-size: 100px; color: #FFE5CC;"></i>
+            <h3 class="mt-4" style="color: #FF9500;">ChÆ°a cÃ³ Ä‘Æ¡n hÃ ng nÃ o</h3>
+            <p class="text-muted">ÄÆ¡n hÃ ng sáº½ xuáº¥t hiá»‡n á»Ÿ Ä‘Ã¢y khi cÃ³ khÃ¡ch Ä‘áº·t mÃ³n</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead style="background-color: #FFF4E6;">
+                    <tr>
+                        <th>MÃ£ Ä‘Æ¡n</th>
+                        <th>KhÃ¡ch hÃ ng</th>
+                        <th>NgÃ y Ä‘áº·t</th>
+                        <th>Tá»•ng tiá»n</th>
+                        <th>Tráº¡ng thÃ¡i</th>
+                        <th>Thao tÃ¡c</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td><strong>#@order.Id</strong></td>
+                            <td>@order.Customer?.FullName</td>
+                            <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><strong style="color: #FF9500;">@order.TotalAmount.ToString("N0") VNÄ</strong></td>
+                            <td>
+                                @{
+                                    var statusBadge = order.Status switch
+                                    {
+                                        "Pending" => "bg-warning",
+                                        "Preparing" => "bg-info",
+                                        "Delivering" => "bg-primary",
+                                        "Completed" => "bg-success",
+                                        "Cancelled" => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                    var statusText = order.Status switch
+                                    {
+                                        "Pending" => "Chá» xÃ¡c nháº­n",
+                                        "Preparing" => "Chuáº©n bá»‹ mÃ³n",
+                                        "Delivering" => "Äang giao",
+                                        "Completed" => "HoÃ n thÃ nh",
+                                        "Cancelled" => "ÄÃ£ há»§y",
+                                        _ => order.Status
+                                    };
+                                }
+                                <span class="badge @statusBadge">@statusText</span>
+                            </td>
+                            <td>
+                                <a asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-sm text-white" style="background-color: #FF9500; border: none;">
+                                    <i class="fa fa-eye"></i> Chi tiáº¿t
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

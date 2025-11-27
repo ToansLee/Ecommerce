@@ -1,0 +1,212 @@
+@model ECommerceMVC.ViewModels.EditProfileVM
+@{
+    ViewData["Title"] = "Chá»‰nh sá»­a thÃ´ng tin";
+    Layout = User.IsInRole("Admin") ? "_LayoutSeller" : "_LayoutCustomer";
+}
+
+<style>
+    .edit-profile-container {
+        max-width: 700px;
+        margin: 50px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 30px rgba(0,0,0,0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .form-header h2 {
+        color: #FF9500;
+        font-weight: 700;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .form-header p {
+        color: #666;
+        font-size: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #FF9500;
+    }
+
+    .form-control {
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #FF9500;
+        box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.15);
+    }
+
+    .text-danger {
+        font-size: 13px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #FF9500 0%, #E67E22 100%);
+        color: white;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 149, 0, 0.3);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: white;
+        color: #666;
+        border: 2px solid #ddd;
+        padding: 14px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-cancel:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+        color: #333;
+    }
+
+    .alert-custom {
+        border-radius: 10px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header-edit {
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/Hinh/Others/cart-page-header-img.jpg') center center/cover;
+        padding: 80px 0 40px;
+        margin-bottom: 0;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header-edit">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-4 text-white mb-3">Chá»‰nh sá»­a thÃ´ng tin</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mb-0" style="background: transparent;">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="breadcrumb-item"><a asp-controller="Seller" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Dashboard</a></li>
+                    }
+                    else
+                    {
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Trang chá»§</a></li>
+                    }
+                    <li class="breadcrumb-item"><a asp-controller="KhachHang" asp-action="Profile" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">ThÃ´ng tin tÃ i khoáº£n</a></li>
+                    <li class="breadcrumb-item text-white" aria-current="page" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Chá»‰nh sá»­a</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="edit-profile-container">
+    <div class="form-header">
+        <h2><i class="fas fa-user-edit"></i> Cáº­p nháº­t thÃ´ng tin</h2>
+        <p>Vui lÃ²ng Ä‘iá»n thÃ´ng tin chÃ­nh xÃ¡c</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState[""]?.Errors.Count > 0)
+    {
+        <div class="alert-custom alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>@ViewData.ModelState[""]?.Errors[0].ErrorMessage</span>
+        </div>
+    }
+
+    <form asp-action="EditProfile" method="post">
+        <div class="form-group">
+            <label asp-for="FullName" class="form-label">
+                <i class="fas fa-user"></i>
+                <span>Há» tÃªn</span>
+            </label>
+            <input asp-for="FullName" class="form-control" placeholder="Nháº­p há» tÃªn Ä‘áº§y Ä‘á»§" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="form-label">
+                <i class="fas fa-envelope"></i>
+                <span>Email</span>
+            </label>
+            <input asp-for="Email" class="form-control" type="email" placeholder="example@email.com" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone" class="form-label">
+                <i class="fas fa-phone"></i>
+                <span>Sá»‘ Ä‘iá»‡n thoáº¡i</span>
+            </label>
+            <input asp-for="Phone" class="form-control" placeholder="0123456789" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i>
+            <span>LÆ°u thay Ä‘á»•i</span>
+        </button>
+
+        <a asp-action="Profile" class="btn-cancel">
+            <i class="fas fa-times"></i>
+            <span>Há»§y bá»</span>
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

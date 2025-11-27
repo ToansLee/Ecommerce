@@ -1,0 +1,99 @@
+@{
+	ViewData["Title"] = "Quên mật khẩu";
+}
+
+<!-- Page Header -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+	<h1 class="text-center text-white display-6">🔐 Quên Mật Khẩu</h1>
+	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
+		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Quên mật khẩu</li>
+	</ol>
+</div>
+
+<!-- Forgot Password Form -->
+<div class="container-fluid py-5" style="background: linear-gradient(to bottom, #FFF8F0 0%, #FFFFFF 100%);">
+	<div class="container py-5">
+		<div class="row justify-content-center">
+			<div class="col-lg-6 col-md-8">
+				<!-- Card Container -->
+				<div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+					<!-- Card Header -->
+					<div class="card-header text-center py-4" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border: none;">
+						<h3 class="text-white mb-0" style="font-weight: 600;">
+							<i class="fas fa-key me-2"></i>Khôi Phục Mật Khẩu
+						</h3>
+						<p class="text-white mb-0 mt-2" style="opacity: 0.9; font-size: 0.95rem;">Nhập email để nhận lại mật khẩu</p>
+					</div>
+
+					<!-- Card Body -->
+					<div class="card-body p-5" style="background-color: #FFFFFF;">
+						@if (ViewBag.ErrorMessage != null)
+						{
+							<div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+								<i class="fas fa-exclamation-circle me-2"></i>
+								<strong>Lỗi!</strong> @ViewBag.ErrorMessage
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+						}
+
+						@if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+						{
+							<div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+								<i class="fas fa-exclamation-circle me-2"></i>
+								@ViewData["ErrorMessage"]
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+						}
+
+						<div class="alert alert-info" role="alert" style="border-radius: 10px; border-left: 4px solid #17a2b8;">
+							<i class="fas fa-info-circle me-2"></i>
+							<strong>Lưu ý:</strong> Mật khẩu hiện tại sẽ được gửi về email đăng ký của bạn. Vui lòng kiểm tra hộp thư đến hoặc thư rác.
+						</div>
+
+						<form asp-action="QuenMatKhau" method="post">
+							<div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+							<div class="mb-4">
+								<label for="email" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+									<i class="fas fa-envelope me-2" style="color: #FF9500;"></i>Email đăng ký
+								</label>
+								<input type="email" id="email" name="email" class="form-control form-control-lg" required style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập email đã đăng ký">
+								<small class="form-text text-muted">
+									<i class="fas fa-lightbulb me-1"></i>Nhập đúng email bạn đã dùng để đăng ký tài khoản
+								</small>
+							</div>
+
+							<div class="text-center mt-4">
+								<button type="submit" class="btn btn-lg w-100 py-3" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border: none; border-radius: 50px; color: white; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(255, 149, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 149, 0, 0.3)'">
+									<i class="fas fa-paper-plane me-2"></i>Gửi Mật Khẩu
+								</button>
+							</div>
+
+							<div class="text-center mt-4">
+								<hr style="border-color: #FFE5CC;">
+								<p class="mb-0" style="color: #6C757D;">
+									<a asp-controller="KhachHang" asp-action="DangNhap" style="color: #FF9500; font-weight: 600; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+										<i class="fas fa-arrow-left me-1"></i>Quay lại đăng nhập
+									</a>
+								</p>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<!-- Additional Info -->
+				<div class="text-center mt-4">
+					<p style="color: #6C757D; font-size: 0.9rem;">
+						<i class="fas fa-shield-alt me-1" style="color: #FF9500;"></i>
+						Thông tin của bạn được bảo mật tuyệt đối
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

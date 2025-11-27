@@ -1,0 +1,164 @@
+@model ECommerceMVC.ViewModels.PaginatedVM<ECommerceMVC.ViewModels.HangHoaVM>
+
+@{
+	ViewData["Title"] = "Index";
+	Layout = "_DanhSachHangHoa";
+}
+
+<!-- Single Page Header start -->
+@section BreadCum {
+	<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+		<h1 class="text-center text-white display-6">Shop</h1>
+		<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+			<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
+			<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Thực đơn</li>
+		</ol>
+	</div>
+}
+<!-- Single Page Header End -->
+
+<!-- Product Count and Sort -->
+<div class="col-12 mb-3">
+	<div class="d-flex justify-content-between align-items-center">
+		<h5 class="text-muted">Có <strong class="text-warning">@Model.TotalItems</strong> sản phẩm.</h5>
+		<form method="get" asp-action="Index" class="d-flex align-items-center">
+			<input type="hidden" name="loai" value="@Model.CategoryId" />
+			<input type="hidden" name="minPrice" value="@Model.MinPrice" />
+			<input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+			<label class="me-2 mb-0">Sắp xếp:</label>
+			<select name="sortBy" class="form-select form-select-sm" style="width: 200px;" onchange="this.form.submit()">
+				<option value="" selected="@(Model.SortBy == null)">Mới nhất</option>
+				<option value="price_asc" selected="@(Model.SortBy == "price_asc")">Giá: Thấp đến cao</option>
+				<option value="price_desc" selected="@(Model.SortBy == "price_desc")">Giá: Cao đến thấp</option>
+			</select>
+		</form>
+	</div>
+</div>
+
+@await Html.PartialAsync("ProductItem", Model.Items)
+
+<div class="col-12">
+	<div class="pagination d-flex justify-content-center mt-5">
+		<!-- N�t Previous -->
+		@if (Model.HasPreviousPage)
+		{
+			<a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" 
+			   asp-route-loai="@Model.CategoryId"
+			   asp-route-minPrice="@Model.MinPrice"
+			   asp-route-maxPrice="@Model.MaxPrice"
+			   asp-route-sortBy="@Model.SortBy" class="rounded">&laquo;</a>
+		}
+		else
+		{
+			<span class="rounded" style="color: #ccc;">&laquo;</span>
+		}
+
+		<!-- C�c trang -->
+		@for (int i = 1; i <= Model.TotalPages; i++)
+		{
+			if (i == Model.CurrentPage)
+			{
+				<a class="active rounded">@i</a>
+			}
+			else if (i >= Model.CurrentPage - 2 && i <= Model.CurrentPage + 2)
+			{
+				<a asp-action="Index" asp-route-page="@i" 
+				   asp-route-loai="@Model.CategoryId"
+				   asp-route-minPrice="@Model.MinPrice"
+				   asp-route-maxPrice="@Model.MaxPrice"
+				   asp-route-sortBy="@Model.SortBy" class="rounded">@i</a>
+			}
+			else if (i == Model.CurrentPage - 3 || i == Model.CurrentPage + 3)
+			{
+				<span class="rounded">...</span>
+			}
+		}
+
+		<!-- N�t Next -->
+		@if (Model.HasNextPage)
+		{
+			<a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" 
+			   asp-route-loai="@Model.CategoryId"
+			   asp-route-minPrice="@Model.MinPrice"
+			   asp-route-maxPrice="@Model.MaxPrice"
+			   asp-route-sortBy="@Model.SortBy" class="rounded">&raquo;</a>
+		}
+		else
+		{
+			<span class="rounded" style="color: #ccc;">&raquo;</span>
+		}
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Handle Add to Cart button clicks
+			$('.btn.border.border-secondary.rounded-pill').off('click').on('click', function (e) {
+				// Check if this is an add to cart link (has fa-shopping-bag icon)
+				if ($(this).find('.fa-shopping-bag').length > 0) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					var url = $(this).attr('href');
+					var button = $(this);
+					var originalText = button.html();
+
+					// Disable button and show loading state
+					button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i> �ang th�m...');
+
+					$.ajax({
+						url: url,
+						type: 'GET',
+						headers: { 'X-Requested-With': 'XMLHttpRequest' },
+						success: function (response) {
+							if (response.success) {
+								// Show success notification
+								var message = $('<div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+									'<i class="fa fa-check-circle me-2"></i>' + response.message +
+									'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+									'</div>');
+								$('body').append(message);
+								setTimeout(function () {
+									message.alert('close');
+								}, 3000);
+
+								// Update cart count
+								if (response.cartCount !== undefined) {
+									$('.cart-count').text(response.cartCount);
+								}
+							} else {
+								// Show error notification
+								var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+									'<i class="fa fa-exclamation-circle me-2"></i>' + response.message +
+									'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+									'</div>');
+								$('body').append(errorMessage);
+								setTimeout(function () {
+									errorMessage.alert('close');
+								}, 3000);
+							}
+
+							// Restore button
+							button.prop('disabled', false).html(originalText);
+						},
+						error: function () {
+							// Show error notification
+							var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-exclamation-circle me-2"></i>C� l?i x?y ra khi th�m v�o gi? h�ng!' +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(errorMessage);
+							setTimeout(function () {
+								errorMessage.alert('close');
+							}, 3000);
+
+							// Restore button
+							button.prop('disabled', false).html(originalText);
+						}
+					});
+				}
+			});
+		});
+	</script>
+}

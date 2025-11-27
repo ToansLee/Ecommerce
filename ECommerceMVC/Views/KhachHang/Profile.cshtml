@@ -1,0 +1,342 @@
+@model ECommerceMVC.Models.Customer
+@{
+    ViewData["Title"] = "ThÃ´ng tin tÃ i khoáº£n";
+    Layout = User.IsInRole("Seller") ? "_LayoutSeller" : "_LayoutCustomer";
+}
+
+<style>
+    .profile-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #FF9500 0%, #E67E22 100%);
+        padding: 40px 30px;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 48px;
+        color: #FF9500;
+        font-weight: bold;
+        border: 5px solid rgba(255,255,255,0.3);
+    }
+
+    .profile-name {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .profile-role {
+        background: rgba(255,255,255,0.2);
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .profile-body {
+        padding: 40px;
+    }
+
+    .profile-section {
+        margin-bottom: 30px;
+    }
+
+    .profile-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #FF9500;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #FFE5CC;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        flex: 0 0 150px;
+        font-weight: 600;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #333;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #f0f0f0;
+    }
+
+    .btn-custom {
+        flex: 1;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #FF9500 0%, #E67E22 100%);
+        color: white;
+        border: none;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 149, 0, 0.3);
+        color: white;
+    }
+
+    .btn-password {
+        background: white;
+        color: #FF9500;
+        border: 2px solid #FF9500;
+    }
+
+    .btn-password:hover {
+        background: #FF9500;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 149, 0, 0.2);
+    }
+
+    .page-header-profile {
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/Hinh/Others/cart-page-header-img.jpg') center center/cover;
+        padding: 80px 0 40px;
+        margin-bottom: 50px;
+    }
+
+    .alert-custom {
+        border-radius: 10px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-success-custom {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+
+    .restaurant-info {
+        background: linear-gradient(135deg, #FFE5CC 0%, #FFD4A3 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+
+    .restaurant-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #E67E22;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header-profile">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-4 text-white mb-3">ThÃ´ng tin tÃ i khoáº£n</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mb-0" style="background: transparent;">
+                    @if (User.IsInRole("Seller"))
+                    {
+                        <li class="breadcrumb-item"><a asp-controller="Seller" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Dashboard</a></li>
+                    }
+                    else
+                    {
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Trang chá»§</a></li>
+                    }
+                    <li class="breadcrumb-item text-white" aria-current="page" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">ThÃ´ng tin tÃ i khoáº£n</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-custom alert-success-custom">
+            <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <div class="profile-card">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                @Model.FullName.Substring(0, 1).ToUpper()
+            </div>
+            <div class="profile-name">@Model.FullName</div>
+            <div class="profile-role">
+                @if (Model.Role == "Seller")
+                {
+                    <i class="fas fa-store"></i> @:NgÆ°á»i bÃ¡n
+                }
+                else
+                {
+                    <i class="fas fa-user"></i> @:KhÃ¡ch hÃ ng
+                }
+            </div>
+        </div>
+
+        <!-- Profile Body -->
+        <div class="profile-body">
+            <!-- ThÃ´ng tin cÆ¡ báº£n -->
+            <div class="profile-section">
+                <div class="profile-section-title">
+                    <i class="fas fa-user-circle" style="font-size: 22px;"></i>
+                    <span>ThÃ´ng tin cÆ¡ báº£n</span>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </div>
+                    <div class="info-value">@Model.Email</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-phone"></i>
+                        <span>Sá»‘ Ä‘iá»‡n thoáº¡i</span>
+                    </div>
+                    <div class="info-value">@(Model.Phone ?? "ChÆ°a cáº­p nháº­t")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-venus-mars"></i>
+                        <span>Giá»›i tÃ­nh</span>
+                    </div>
+                    <div class="info-value">@(Model.Gender ? "Nam" : "Ná»¯")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>NgÃ y sinh</span>
+                    </div>
+                    <div class="info-value">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "ChÆ°a cáº­p nháº­t")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Äá»‹a chá»‰</span>
+                    </div>
+                    <div class="info-value">@(Model.Address ?? "ChÆ°a cáº­p nháº­t")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>NgÃ y tham gia</span>
+                    </div>
+                    <div class="info-value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <i class="fas fa-toggle-on"></i>
+                        <span>Tráº¡ng thÃ¡i</span>
+                    </div>
+                    <div class="info-value">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Äang hoáº¡t Ä‘á»™ng</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">ÄÃ£ khÃ³a</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ThÃ´ng tin nhÃ  hÃ ng (chá»‰ hiá»ƒn thá»‹ cho Seller) -->
+            @if (Model.Role == "Seller" && Model.Restaurant != null)
+            {
+                <div class="profile-section">
+                    <div class="profile-section-title">
+                        <i class="fas fa-store" style="font-size: 22px;"></i>
+                        <span>ThÃ´ng tin nhÃ  hÃ ng</span>
+                    </div>
+                    <div class="restaurant-info">
+                        <div class="restaurant-name">
+                            <i class="fas fa-utensils"></i>
+                            <span>@Model.Restaurant.Name</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Restaurant.Address))
+                        {
+                            <div style="color: #666; margin-top: 5px;">
+                                <i class="fas fa-map-marker-alt"></i> @Model.Restaurant.Address
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Restaurant.Phone))
+                        {
+                            <div style="color: #666; margin-top: 5px;">
+                                <i class="fas fa-phone"></i> @Model.Restaurant.Phone
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a asp-action="EditProfile" class="btn btn-custom btn-edit">
+                    <i class="fas fa-edit"></i>
+                    <span>Chá»‰nh sá»­a thÃ´ng tin</span>
+                </a>
+                <a asp-action="ChangePassword" class="btn btn-custom btn-password">
+                    <i class="fas fa-lock"></i>
+                    <span>Äá»•i máº­t kháº©u</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

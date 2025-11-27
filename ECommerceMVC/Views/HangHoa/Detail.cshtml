@@ -1,0 +1,270 @@
+@model ECommerceMVC.ViewModels.ChiTietHangHoaVM
+@{
+	ViewData["Title"] = "Detail";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+	<h1 class="text-center text-white display-6">Shop Detail</h1>
+	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="HangHoa" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Thực đơn</a></li>
+		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">@Model.TenHH</li>
+	</ol>
+</div>
+<!-- Single Page Header End -->
+
+<!-- Single Product Start -->
+<div class="container-fluid py-5 mt-5">
+	<div class="container py-5">
+		<div class="row g-4 mb-5">
+			<div class="col-lg-8 col-xl-9">
+				<div class="row g-4">
+					<div class="col-lg-6">
+						<div class="border rounded">
+							<a asp-action="Detail" asp-route-id="@Model.MaHh">
+								<img src="~/Hinh/HangHoa/@Model.Hinh" class="img-fluid rounded" alt="@Model.TenHH">
+							</a>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<h4 class="fw-bold mb-3">@Model.TenHH</h4>
+						<p class="mb-3">Danh mục: @Model.TenLoai</p>
+						<h5 class="fw-bold mb-3">@Model.DonGia.ToString("N0") VNĐ</h5>
+						<p class="mb-4">@Model.MoTaNgan</p>
+						<form id="addToCartForm" asp-action="AddToCart" asp-controller="Cart" asp-route-id="@Model.MaHh">
+							<div class="input-group quantity mb-5" style="width: 100px;">
+								<div class="input-group-btn">
+									<button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
+										<i class="fa fa-minus"></i>
+									</button>
+								</div>
+								<input type="text" class="form-control form-control-sm text-center border-0" value="1" name="quantity" id="quantity">
+								<div class="input-group-btn">
+									<button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
+										<i class="fa fa-plus"></i>
+									</button>
+								</div>
+							</div>
+							<button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
+								<i class="fa fa-shopping-bag me-2 text-primary"></i> Đưa vào giỏ
+							</button>
+						</form>
+						<div id="cartMessage" class="alert alert-success mt-3" style="display: none;"></div>
+					</div>
+					<div class="col-lg-12">
+						<nav>
+							<div class="nav nav-tabs mb-3">
+							<button class="nav-link active border-white border-bottom-0" type="button" role="tab"
+									id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
+									aria-controls="nav-about" aria-selected="true">
+								Thông tin hàng hóa
+							</button>
+							</div>
+						</nav>
+						<div class="tab-content mb-5">
+							<div class="tab-pane active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+								<p>@Model.ChiTiet</p>
+							</div>
+						</div>
+					</div>
+
+					@if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
+					{
+						<div class="col-lg-12">
+							<h4 class="fw-bold mb-3">Sản phẩm cùng nhà hàng</h4>
+							<div class="row g-4">
+								@foreach (var product in Model.RelatedProducts)
+								{
+									<div class="col-md-6 col-lg-4 col-xl-3">
+										<div class="rounded position-relative fruite-item h-100 d-flex flex-column">
+											<div class="fruite-img" style="height: 200px; overflow: hidden;">
+												<a asp-action="Detail" asp-route-id="@product.MaHh">
+													<img src="~/Hinh/HangHoa/@product.Hinh" class="w-100 h-100 rounded-top" style="object-fit: cover;" alt="@product.TenHH">
+												</a>
+											</div>
+											<div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">@product.TenLoai</div>
+											<div class="p-4 border border-secondary border-top-0 rounded-bottom flex-grow-1 d-flex flex-column">
+												<h4 style="height: 48px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><a asp-action="Detail" asp-route-id="@product.MaHh" style="text-decoration: none; color: inherit;">@product.TenHH</a></h4>
+												<p style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">@product.MoTaNgan</p>
+												<div class="d-flex justify-content-between flex-lg-wrap mt-auto">
+													<p class="text-dark fs-5 fw-bold mb-0">@product.DonGia.ToString("N0") VN�</p>
+													<a href="#" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart-related" data-product-id="@product.MaHh">
+														<i class="fa fa-shopping-bag me-2 text-primary"></i> �ua v�o gi?
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+			<div class="col-lg-4 col-xl-3">
+				<div class="row g-4 fruite">
+					<div class="col-lg-12">
+						@await Html.PartialAsync("_TimKiemPanel")
+					</div>
+					<div class="col-lg-12">
+						@await Component.InvokeAsync("MenuLoai")
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Single Product End -->
+
+@section Scripts {
+	<script>
+		$(document).ready(function() {
+			// Handle quantity buttons
+			$('.btn-plus').click(function () {
+				var input = $(this).closest('.quantity').find('input');
+				var value = parseInt(input.val()) || 1;
+				input.val(value + 1);
+			});
+
+			$('.btn-minus').click(function () {
+				var input = $(this).closest('.quantity').find('input');
+				var value = parseInt(input.val()) || 1;
+				if (value > 1) {
+					input.val(value - 1);
+				}
+			});
+
+			// Handle AJAX form submission (main add to cart)
+			$('#addToCartForm').on('submit', function(e) {
+				e.preventDefault();
+				
+				var form = $(this);
+				var url = form.attr('action');
+				var quantity = $('#quantity').val();
+				var submitBtn = form.find('button[type="submit"]');
+				var originalText = submitBtn.html();
+				
+				// Disable button and show loading
+				submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i> �ang th�m...');
+				
+				$.ajax({
+					url: url,
+					type: 'POST',
+					data: { quantity: quantity },
+					headers: { 'X-Requested-With': 'XMLHttpRequest' },
+					success: function(response) {
+						if (response.success) {
+						// Show success notification
+						var message = $('<div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+							'<i class="fa fa-check-circle me-2"></i>' + (response.message || 'Đã thêm sản phẩm vào giỏ hàng!') +
+							'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+							'</div>');
+							$('body').append(message);
+							setTimeout(function () {
+								message.alert('close');
+							}, 3000);
+
+							// Update cart count if element exists
+							if (response.cartCount !== undefined) {
+								$('.cart-count').text(response.cartCount);
+							}
+						} else {
+							// Show error notification
+							var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-exclamation-circle me-2"></i>' + (response.message || 'C� l?i x?y ra!') +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(errorMessage);
+							setTimeout(function () {
+								errorMessage.alert('close');
+							}, 3000);
+						}
+						
+						// Restore button
+						submitBtn.prop('disabled', false).html(originalText);
+					},
+					error: function() {
+						// Show error notification
+						var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+							'<i class="fa fa-exclamation-circle me-2"></i>C� l?i x?y ra khi th�m v�o gi? h�ng!' +
+							'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+							'</div>');
+						$('body').append(errorMessage);
+						setTimeout(function () {
+							errorMessage.alert('close');
+						}, 3000);
+						
+						// Restore button
+						submitBtn.prop('disabled', false).html(originalText);
+					}
+				});
+			});
+
+			// Handle related products add to cart
+			$('.add-to-cart-related').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				var productId = $(this).data('product-id');
+				var button = $(this);
+				var originalText = button.html();
+
+				// Disable button and show loading state
+				button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> �ang th�m...');
+
+				$.ajax({
+					url: '@Url.Action("AddToCart", "Cart")',
+					type: 'POST',
+					data: { id: productId, quantity: 1 },
+					headers: { 'X-Requested-With': 'XMLHttpRequest' },
+					success: function (response) {
+						if (response.success) {
+							// Show success notification
+							var message = $('<div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-check-circle me-2"></i>' + response.message +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(message);
+							setTimeout(function () {
+								message.alert('close');
+							}, 3000);
+
+							// Update cart count
+							if (response.cartCount !== undefined) {
+								$('.cart-count').text(response.cartCount);
+							}
+						} else {
+							// Show error notification
+							var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-exclamation-circle me-2"></i>' + response.message +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(errorMessage);
+							setTimeout(function () {
+								errorMessage.alert('close');
+							}, 3000);
+						}
+
+						// Restore button
+						button.prop('disabled', false).html(originalText);
+					},
+					error: function () {
+						// Show error notification
+						var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+							'<i class="fa fa-exclamation-circle me-2"></i>C� l?i x?y ra khi th�m v�o gi? h�ng!' +
+							'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+							'</div>');
+						$('body').append(errorMessage);
+						setTimeout(function () {
+							errorMessage.alert('close');
+						}, 3000);
+
+						// Restore button
+						button.prop('disabled', false).html(originalText);
+					}
+				});
+			});
+		});
+	</script>
+}

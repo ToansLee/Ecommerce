@@ -1,0 +1,118 @@
+@model ECommerceMVC.Models.Order
+@{
+    ViewData["Title"] = "Chi tiáº¿t Ä‘Æ¡n hÃ ng";
+    var statusText = Model.Status switch
+    {
+        "Pending" => "Chá» xÃ¡c nháº­n",
+        "Preparing" => "Chuáº©n bá»‹ mÃ³n",
+        "Delivering" => "Äang giao",
+        "Completed" => "HoÃ n thÃ nh",
+        "Cancelled" => "ÄÃ£ há»§y",
+        _ => Model.Status
+    };
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+    <h1 class="text-center text-white display-6">Chi tiáº¿t Ä‘Æ¡n hÃ ng #@Model.Id</h1>
+</div>
+<!-- Single Page Header End -->
+
+<!-- Order Details Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng -->
+                <div class="rounded p-4 mb-4 text-center" style="background-color: #FFF4E6;">
+                    <h4 class="mb-3" style="color: #FF9500;">Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng</h4>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
+                        <div class="flex-fill text-center">
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Pending" || Model.Status == "Preparing" || Model.Status == "Delivering" || Model.Status == "Completed" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
+                                <i class="fas fa-clock text-white fa-2x"></i>
+                            </div>
+                            <small class="fw-bold">Chá» xÃ¡c nháº­n</small>
+                        </div>
+                        
+                        <div class="flex-fill" style="height: 3px; background-color: @(Model.Status == "Preparing" || Model.Status == "Delivering" || Model.Status == "Completed" ? "#28a745" : "#dee2e6"); margin: 0 10px 30px;"></div>
+                        
+                        <div class="flex-fill text-center">
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Preparing" || Model.Status == "Delivering" || Model.Status == "Completed" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
+                                <i class="fas fa-utensils text-white fa-2x"></i>
+                            </div>
+                            <small class="fw-bold">Chuáº©n bá»‹ mÃ³n</small>
+                        </div>
+                        
+                        <div class="flex-fill" style="height: 3px; background-color: @(Model.Status == "Delivering" || Model.Status == "Completed" ? "#28a745" : "#dee2e6"); margin: 0 10px 30px;"></div>
+                        
+                        <div class="flex-fill text-center">
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Delivering" || Model.Status == "Completed" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
+                                <i class="fas fa-shipping-fast text-white fa-2x"></i>
+                            </div>
+                            <small class="fw-bold">Äang giao</small>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tráº¡ng thÃ¡i hiá»‡n táº¡i: <strong>@statusText</strong>
+                    </div>
+                </div>
+
+                <!-- ThÃ´ng tin Ä‘Æ¡n hÃ ng -->
+                <div class="rounded p-4 mb-4" style="background-color: #FFF4E6;">
+                    <h4 class="mb-3" style="color: #FF9500;">ThÃ´ng tin Ä‘Æ¡n hÃ ng</h4>
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>MÃ£ Ä‘Æ¡n hÃ ng:</strong></div>
+                        <div class="col-6">#@Model.Id</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>NgÃ y Ä‘áº·t:</strong></div>
+                        <div class="col-6">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>Tá»•ng tiá»n:</strong></div>
+                        <div class="col-6 fw-bold" style="color: #FF9500;">@Model.TotalAmount.ToString("N0") VNÄ</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6"><strong>PhÆ°Æ¡ng thá»©c thanh toÃ¡n:</strong></div>
+                        <div class="col-6">Thanh toÃ¡n khi nháº­n hÃ ng (COD)</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="row">
+                            <div class="col-6"><strong>Ghi chÃº:</strong></div>
+                            <div class="col-6">@Model.Notes</div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Chi tiáº¿t sáº£n pháº©m -->
+                <div class="rounded p-4 mb-4" style="background-color: #FFF4E6;">
+                    <h4 class="mb-3" style="color: #FF9500;">Chi tiáº¿t sáº£n pháº©m</h4>
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <img src="~/Hinh/HangHoa/@item.MenuItem?.Image" class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;" alt="@item.MenuItem?.Name">
+                                <div class="ms-3">
+                                    <h6 class="mb-1">@item.MenuItem?.Name</h6>
+                                    <small class="text-muted">Sá»‘ lÆ°á»£ng: @item.Quantity Ã— @item.UnitPrice.ToString("N0") VNÄ</small>
+                                </div>
+                            </div>
+                            <p class="mb-0 fw-bold">@((item.Quantity * item.UnitPrice).ToString("N0")) VNÄ</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-action="Index" class="btn btn-lg text-white" style="background-color: #FF9500; border: none; border-radius: 50px; padding: 12px 40px;">
+                        <i class="fa fa-arrow-left me-2"></i>Quay láº¡i lá»‹ch sá»­
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Order Details End -->

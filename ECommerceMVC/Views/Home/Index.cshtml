@@ -1,0 +1,282 @@
+@model IEnumerable<ECommerceMVC.ViewModels.HangHoaVM>
+
+@{
+	ViewData["Title"] = "Home Page";
+	Layout = "~/Views/Shared/_LayoutCustomer.cshtml";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+	<h1 class="text-center text-white display-6">🍕 Thực đơn ngon lành</h1>
+	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
+		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Danh sách món ăn</li>
+	</ol>
+</div>
+<!-- Single Page Header End -->
+
+<!-- Features Section Start -->
+<div class="container-fluid py-5" style="background-color: #FFF8F0;">
+	<div class="container py-5">
+		<div class="row g-4">
+				<div class="col-md-6 col-lg-3">
+					<div class="text-center p-4" style="background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(255, 189, 128, 0.1);">
+					<div class="mb-3">
+						<i class="fas fa-shipping-fast" style="font-size: 2.5rem; color: #FFBD80;"></i>
+					</div>
+					<h4 style="color: #FFBD80; min-height: 32px;">Giao hàng nhanh</h4>
+					<p class="mb-0" style="color: #7F8C8D; min-height: 48px;">Giao hàng miễn phí cho đơn trên 500k</p>
+				</div>
+			</div>
+		<div class="col-md-6 col-lg-3">
+				<div class="text-center p-4" style="background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(255, 189, 128, 0.1);">
+				<div class="mb-3">
+					<i class="fas fa-leaf" style="font-size: 2.5rem; color: #FFBD80;"></i>
+				</div>
+				<h4 style="color: #FFBD80; min-height: 32px;">Tươi ngon đảm bảo</h4>
+				<p class="mb-0" style="color: #7F8C8D; min-height: 48px;">Nguyên liệu tươi mới mỗi ngày</p>
+			</div>
+		</div>
+			<div class="col-md-6 col-lg-3">
+				<div class="text-center p-4" style="background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(255, 189, 128, 0.1);">
+				<div class="mb-3">
+					<i class="fas fa-utensils" style="font-size: 2.5rem; color: #FFBD80;"></i>
+				</div>
+				<h4 style="color: #FFBD80; min-height: 32px;">Đa dạng món ăn</h4>
+				<p class="mb-0" style="color: #7F8C8D; min-height: 48px;">Hàng trăm món ngon từ nhiều nhà hàng</p>
+			</div>
+		</div>
+			<div class="col-md-6 col-lg-3">
+				<div class="text-center p-4" style="background-color: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(255, 189, 128, 0.1);">
+				<div class="mb-3">
+					<i class="fas fa-headset" style="font-size: 2.5rem; color: #FFBD80;"></i>
+				</div>
+				<h4 style="color: #FFBD80; min-height: 32px;">Hỗ trợ 24/7</h4>
+				<p class="mb-0" style="color: #7F8C8D; min-height: 48px;">Luôn sẵn sàng hỗ trợ bạn mọi lúc</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Features Section End -->
+
+<!-- Fruits Shop Start -->
+<div class="container-fluid py-5">
+	<div class="container py-5">
+		<div class="tab-class text-center">
+			<div class="row g-4 mb-5">
+				<div class="col-lg-4 text-start">
+					<h1 style="color: #FFBD80; font-weight: 700;">🍽️ Các Món Ăn Nổi Bật</h1>
+				</div>
+				<div class="col-lg-8 text-end">
+					<ul class="nav nav-pills d-inline-flex text-center mb-5" style="gap: 10px;">
+						<li class="nav-item">
+							<a class="nav-link category-tab d-flex m-2 py-2 px-4 rounded-pill active" data-bs-toggle="pill" href="#tab-all">
+								<span>Tất cả</span>
+							</a>
+						</li>
+						@foreach (var category in ViewBag.Categories)
+						{
+							<li class="nav-item">
+								<a class="nav-link category-tab d-flex py-2 m-2 px-4 rounded-pill" data-bs-toggle="pill" href="#tab-@category.Id">
+									<span>@category.Name</span>
+								</a>
+							</li>
+						}
+					</ul>
+				</div>
+			</div>
+			<div class="tab-content">
+				<!-- All Products Tab -->
+				<div id="tab-all" class="tab-pane fade show p-0 active">
+					<div class="row g-4">
+						<div class="col-lg-12">
+							<div class="row g-4">
+								@if (Model.Any())
+								{
+									@foreach (var item in Model.Take(8))
+									{
+										<div class="col-md-6 col-lg-4 col-xl-3">
+											<div class="rounded position-relative fruite-item d-flex flex-column" style="background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; height: 100%;">
+												<div class="fruite-img" style="overflow: hidden; height: 220px; flex-shrink: 0;">
+													<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
+														<img src="~/Hinh/HangHoa/@item.Hinh" class="img-fluid w-100" style="height: 100%; object-fit: cover;">
+													</a>
+												</div>
+												<div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px; background-color: #FF9500; font-size: 0.85rem; font-weight: 600;">@item.TenLoai</div>
+												<div class="p-4 border-top d-flex flex-column flex-grow-1" style="border-top: 1px solid #FFE4CC;">
+													<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh" style="text-decoration: none; color: #2C3E50;">
+														<h5 style="font-weight: 600; min-height: 50px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@item.TenHH</h5>
+													</a>
+													<p style="color: #7F8C8D; font-size: 0.9rem; flex-grow: 1; min-height: 60px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">@item.MoTaNgan</p>
+													<div class="d-flex justify-content-between align-items-center mt-auto">
+														<p style="font-size: 1.25rem; color: #FF9500; font-weight: 700; margin: 0;">@item.DonGia.ToString("N0") VNĐ</p>
+													<a href="#" class="btn add-to-cart-btn" data-product-id="@item.MaHh" style="background-color: #FF9500; color: white; border: none; border-radius: 25px; padding: 0.5rem 1.2rem; font-weight: 500; white-space: nowrap;">
+														<i class="fa fa-shopping-bag me-1"></i> Đưa vào giỏ
+													</a>
+													</div>
+												</div>
+											</div>
+										</div>
+									}
+								}
+								else
+								{
+									<div class="col-12">
+										<div class="alert alert-info" role="alert">
+											<h4 class="alert-heading">No products available</h4>
+											<p>Sorry, there are no products available at the moment. Please check back later!</p>
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Category Tabs -->
+				@foreach (var category in ViewBag.Categories)
+				{
+					var categoryItems = Model.Where(m => m.MaLoai == category.Id).Take(8).ToList();
+					<div id="tab-@category.Id" class="tab-pane fade show p-0">
+						<div class="row g-4">
+							<div class="col-lg-12">
+								<div class="row g-4">
+									@if (categoryItems.Any())
+									{
+										@foreach (var item in categoryItems)
+										{
+											<div class="col-md-6 col-lg-4 col-xl-3">
+												<div class="rounded position-relative fruite-item d-flex flex-column" style="background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); transition: all 0.3s ease; height: 100%;">
+													<div class="fruite-img" style="overflow: hidden; height: 220px; flex-shrink: 0;">
+														<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
+															<img src="~/Hinh/HangHoa/@item.Hinh" class="img-fluid w-100" style="height: 100%; object-fit: cover;">
+														</a>
+													</div>
+													<div class="text-white px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px; background-color: #FF9500; font-size: 0.85rem; font-weight: 600;">@item.TenLoai</div>
+													<div class="p-4 border-top d-flex flex-column flex-grow-1" style="border-top: 1px solid #FFE4CC;">
+														<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh" style="text-decoration: none; color: #2C3E50;">
+															<h5 style="font-weight: 600; min-height: 50px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@item.TenHH</h5>
+														</a>
+														<p style="color: #7F8C8D; font-size: 0.9rem; flex-grow: 1; min-height: 60px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">@item.MoTaNgan</p>
+														<div class="d-flex justify-content-between align-items-center mt-auto">
+															<p style="font-size: 1.25rem; color: #FF9500; font-weight: 700; margin: 0;">@item.DonGia.ToString("N0") VNĐ</p>
+															<a asp-action="AddToCart" asp-controller="Cart" asp-route-id="@item.MaHh" class="btn" style="background-color: #FF9500; color: white; border: none; border-radius: 25px; padding: 0.5rem 1.2rem; font-weight: 500; white-space: nowrap;">
+																<i class="fa fa-shopping-bag me-1"></i> Đưa vào giỏ
+															</a>
+														</div>
+													</div>
+												</div>
+											</div>
+										}
+									}
+									else
+									{
+										<div class="col-12">
+											<div class="alert alert-warning" role="alert" style="background-color: #FFE5CC; border-color: #FF9500; color: #2C3E50;">
+												<i class="fas fa-info-circle me-2"></i>Không có món ăn nào trong danh mục @category.Name
+											</div>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Fruits Shop End -->
+
+<!-- Subscribe Section Start -->
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #FFBD80 0%, #F5A960 100%);">
+	<div class="container py-5">
+		<div class="mx-auto text-center mb-5" style="max-width: 500px;">
+			<h1 class="mb-4" style="color: white;">📬 Đăng ký nhận ưu đãi</h1>
+			<p style="color: rgba(255, 255, 255, 0.9);">Đăng ký nhận các ưu đãi độc quyền và thông tin về những món ăn mới nhất!</p>
+		</div>
+		<div class="row justify-content-center">
+			<div class="col-md-6">
+				<div class="p-3 rounded-pill" style="background-color: white;">
+					<div class="input-group">
+						<input type="email" class="form-control border-0 ps-4 py-3" placeholder="Nhập email của bạn" style="border-radius: 25px 0 0 25px;">
+						<button class="btn rounded-pill px-4" type="button" style="background-color: #FFB366; color: white; border-radius: 0 25px 25px 0; border: none;">Đăng ký</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Subscribe Section End -->
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Handle Add to Cart button clicks
+			$('.add-to-cart-btn').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				var productId = $(this).data('product-id');
+				var button = $(this);
+				var originalText = button.html();
+
+				// Disable button and show loading state
+				button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> Đang thêm...');
+
+				$.ajax({
+					url: '@Url.Action("AddToCart", "Cart")',
+					type: 'POST',
+					data: { id: productId, quantity: 1 },
+					headers: { 'X-Requested-With': 'XMLHttpRequest' },
+					success: function (response) {
+						if (response.success) {
+							// Show success notification
+							var message = $('<div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-check-circle me-2"></i>' + response.message +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(message);
+							setTimeout(function () {
+								message.alert('close');
+							}, 3000);
+
+							// Update cart count
+							if (response.cartCount !== undefined) {
+								$('.cart-count').text(response.cartCount);
+							}
+						} else {
+							// Show error notification
+							var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-exclamation-circle me-2"></i>' + response.message +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(errorMessage);
+							setTimeout(function () {
+								errorMessage.alert('close');
+							}, 3000);
+						}
+
+						// Restore button
+						button.prop('disabled', false).html(originalText);
+					},
+					error: function () {
+						// Show error notification
+						var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+							'<i class="fa fa-exclamation-circle me-2"></i>Có lỗi xảy ra khi thêm vào giỏ hàng!' +
+							'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+							'</div>');
+						$('body').append(errorMessage);
+						setTimeout(function () {
+							errorMessage.alert('close');
+						}, 3000);
+
+						// Restore button
+						button.prop('disabled', false).html(originalText);
+					}
+				});
+			});
+		});
+	</script>
+}

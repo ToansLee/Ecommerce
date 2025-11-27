@@ -1,0 +1,134 @@
+@model List<ECommerceMVC.Models.MenuItem>
+@{
+	ViewData["Title"] = "Quáº£n lÃ½ mÃ³n Äƒn";
+	Layout = "~/Views/Shared/_LayoutSeller.cshtml";
+}
+
+<div class="container-fluid py-5" style="background: linear-gradient(to bottom, #FFF8F0 0%, #FFFFFF 100%);">
+	<div class="container py-5">
+		<!-- Header -->
+		<div class="row mb-4">
+			<div class="col-md-8">
+				<h2 style="color: #FF9500; font-weight: 700;">
+					<i class="fas fa-utensils me-2"></i>Quáº£n lÃ½ mÃ³n Äƒn
+				</h2>
+				<p style="color: #6C757D;">Tá»•ng sá»‘: @Model.Count mÃ³n</p>
+			</div>
+			<div class="col-md-4 text-end">
+				<a asp-action="CreateMenuItem" class="btn btn-lg" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); color: white; border-radius: 10px; border: none;">
+					<i class="fas fa-plus-circle me-2"></i>ThÃªm mÃ³n má»›i
+				</a>
+			</div>
+		</div>
+
+		<!-- Menu Items Table -->
+		<div class="card border-0 shadow-sm" style="border-radius: 15px;">
+			<div class="card-body p-0">
+				<div class="table-responsive">
+					<table class="table table-hover mb-0">
+						<thead style="background-color: #FFF4E6;">
+							<tr>
+								<th style="padding: 1rem; border: none;">áº¢nh</th>
+								<th style="padding: 1rem; border: none;">TÃªn mÃ³n</th>
+								<th style="padding: 1rem; border: none;">Danh má»¥c</th>
+								<th style="padding: 1rem; border: none;">GiÃ¡</th>
+								<th style="padding: 1rem; border: none;">Tráº¡ng thÃ¡i</th>
+								<th style="padding: 1rem; border: none;" class="text-center">Thao tÃ¡c</th>
+							</tr>
+						</thead>
+						<tbody>
+							@if (Model.Count == 0)
+							{
+								<tr>
+									<td colspan="6" class="text-center py-5">
+										<i class="fas fa-inbox fa-3x mb-3" style="color: #FFE5CC;"></i>
+										<p style="color: #6C757D;">ChÆ°a cÃ³ mÃ³n Äƒn nÃ o. <a asp-action="CreateMenuItem" style="color: #FF9500;">ThÃªm mÃ³n má»›i</a></p>
+									</td>
+								</tr>
+							}
+							else
+							{
+								@foreach (var item in Model)
+								{
+									<tr>
+										<td style="padding: 1rem;">
+											@if (!string.IsNullOrEmpty(item.Image))
+											{
+												<img src="~/Hinh/HangHoa/@item.Image" alt="@item.Name" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='/Hinh/Others/default.jpg'">
+											}
+											else
+											{
+												<div style="width: 60px; height: 60px; background-color: #FFE5CC; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+													<i class="fas fa-utensils" style="color: #FF9500;"></i>
+												</div>
+											}
+										</td>
+										<td style="padding: 1rem; vertical-align: middle;">
+											<strong style="color: #2C3E50;">@item.Name</strong>
+											@if (!string.IsNullOrEmpty(item.Description))
+											{
+												<br><small style="color: #6C757D;">@(item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</small>
+											}
+										</td>
+										<td style="padding: 1rem; vertical-align: middle;">
+											@if (item.Category != null)
+											{
+												<span class="badge" style="background-color: #FFE5CC; color: #FF9500; font-size: 0.85rem;">@item.Category.Name</span>
+											}
+										</td>
+										<td style="padding: 1rem; vertical-align: middle;">
+											<strong style="color: #FF9500;">@string.Format("{0:N0}Ä‘", item.Price)</strong>
+										</td>
+										<td style="padding: 1rem; vertical-align: middle;">
+											@if (item.IsAvailable)
+											{
+												<span class="badge bg-success">CÃ²n hÃ ng</span>
+											}
+											else
+											{
+												<span class="badge bg-secondary">Háº¿t hÃ ng</span>
+											}
+										</td>
+										<td style="padding: 1rem; vertical-align: middle;" class="text-center">
+											<a asp-action="EditMenuItem" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2" style="border-radius: 8px;">
+												<i class="fas fa-edit"></i>
+											</a>
+											<button class="btn btn-sm btn-danger" style="border-radius: 8px;" onclick="deleteMenuItem(@item.Id, '@item.Name')">
+												<i class="fas fa-trash"></i>
+											</button>
+										</td>
+									</tr>
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		function deleteMenuItem(id, name) {
+			if (confirm('Bạn có chắc muốn xóa món "' + name + '" không?')) {
+				$.ajax({
+					url: '@Url.Action("DeleteMenuItem", "Seller")',
+					type: 'POST',
+					data: { id: id },
+					success: function (response) {
+						if (response.success) {
+							alert(response.message);
+							location.reload();
+						} else {
+							alert(response.message);
+						}
+					},
+					error: function () {
+						alert('CÃ³ lá»—i xáº£y ra khi xÃ³a mÃ³n Äƒn');
+					}
+				});
+			}
+		}
+	</script>
+}

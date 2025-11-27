@@ -1,0 +1,327 @@
+@{
+    ViewData["Title"] = "XÃ¡c thá»±c OTP";
+}
+
+<style>
+    .verify-otp-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #FFF8F0 0%, #FFE5CC 100%);
+        padding: 20px;
+    }
+
+    .otp-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(255, 149, 0, 0.2);
+        max-width: 500px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .otp-header {
+        background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%);
+        padding: 40px 30px;
+        text-align: center;
+        color: white;
+    }
+
+    .otp-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 40px;
+    }
+
+    .otp-body {
+        padding: 40px;
+    }
+
+    .email-display {
+        background: #FFF4E6;
+        border-left: 4px solid #FF9500;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .email-display i {
+        color: #FF9500;
+        margin-right: 10px;
+    }
+
+    .otp-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 30px 0;
+    }
+
+    .otp-input {
+        width: 50px;
+        height: 60px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        border: 2px solid #FFE5CC;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .otp-input:focus {
+        border-color: #FF9500;
+        box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.15);
+        outline: none;
+    }
+
+    .btn-verify {
+        background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-verify:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 149, 0, 0.3);
+    }
+
+    .btn-verify:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .resend-section {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .btn-resend {
+        background: none;
+        border: none;
+        color: #FF9500;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    .btn-resend:disabled {
+        color: #999;
+        cursor: not-allowed;
+    }
+
+    .countdown {
+        color: #666;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .alert-custom {
+        border-radius: 10px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        color: #c62828;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        color: #2e7d32;
+    }
+</style>
+
+<div class="verify-otp-container">
+    <div class="otp-card">
+        <div class="otp-header">
+            <div class="otp-icon">
+                <i class="fas fa-envelope-open"></i>
+            </div>
+            <h2 style="margin: 0; font-size: 28px;">XÃ¡c thá»±c OTP</h2>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Nháº­p mÃ£ OTP Ä‘Ã£ Ä‘Æ°á»£c gá»­i Ä‘áº¿n email cá»§a báº¡n</p>
+        </div>
+
+        <div class="otp-body">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert-custom alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>@ViewBag.ErrorMessage</span>
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert-custom alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>@TempData["SuccessMessage"]</span>
+                </div>
+            }
+
+            <div class="email-display">
+                <i class="fas fa-envelope"></i>
+                <strong id="displayEmail">@ViewBag.Email</strong>
+            </div>
+
+            <form asp-action="VerifyOTP" method="post" id="otpForm">
+                <input type="hidden" name="email" value="@ViewBag.Email" id="hiddenEmail" />
+                
+                <div class="otp-inputs">
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" />
+                    <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" />
+                </div>
+
+                <input type="hidden" name="otp" id="otpValue" />
+
+                <button type="submit" class="btn-verify" id="btnVerify">
+                    <i class="fas fa-check-circle me-2"></i>XÃ¡c thá»±c
+                </button>
+            </form>
+
+            <div class="resend-section">
+                <p style="color: #666; margin-bottom: 10px;">KhÃ´ng nháº­n Ä‘Æ°á»£c mÃ£?</p>
+                <button type="button" class="btn-resend" id="btnResend" onclick="resendOTP()">
+                    Gá»­i láº¡i mÃ£ OTP
+                </button>
+                <div class="countdown" id="countdown"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const otpValue = document.getElementById('otpValue');
+    const btnVerify = document.getElementById('btnVerify');
+    const btnResend = document.getElementById('btnResend');
+    const countdownDiv = document.getElementById('countdown');
+
+    // Auto-focus vÃ  di chuyá»ƒn giá»¯a cÃ¡c Ã´ input
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            
+            if (value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+
+            updateOTPValue();
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text');
+            const digits = pastedData.match(/\d/g);
+            
+            if (digits) {
+                digits.slice(0, 6).forEach((digit, i) => {
+                    if (otpInputs[i]) {
+                        otpInputs[i].value = digit;
+                    }
+                });
+                updateOTPValue();
+            }
+        });
+    });
+
+    function updateOTPValue() {
+        const otp = Array.from(otpInputs).map(input => input.value).join('');
+        otpValue.value = otp;
+        btnVerify.disabled = otp.length !== 6;
+    }
+
+    // Countdown timer
+    let countdown = 300; // 5 phÃºt
+    const timer = setInterval(() => {
+        countdown--;
+        const minutes = Math.floor(countdown / 60);
+        const seconds = countdown % 60;
+        countdownDiv.textContent = `MÃ£ OTP háº¿t háº¡n sau: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (countdown <= 0) {
+            clearInterval(timer);
+            countdownDiv.innerHTML = '<span style="color: #FF9500;">MÃ£ OTP Ä‘Ã£ háº¿t háº¡n</span>';
+            btnVerify.disabled = true;
+        }
+    }, 1000);
+
+    // Resend OTP
+    let resendCooldown = 0;
+    function resendOTP() {
+        if (resendCooldown > 0) return;
+
+        const email = document.getElementById('hiddenEmail').value;
+        btnResend.disabled = true;
+
+        fetch('/KhachHang/ResendOTP', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `email=${encodeURIComponent(email)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                countdown = 300;
+                btnVerify.disabled = false;
+                
+                // Cooldown 60 giÃ¢y trÆ°á»›c khi gá»­i láº¡i
+                resendCooldown = 60;
+                const cooldownTimer = setInterval(() => {
+                    resendCooldown--;
+                    btnResend.textContent = `Gá»­i láº¡i sau ${resendCooldown}s`;
+                    if (resendCooldown <= 0) {
+                        clearInterval(cooldownTimer);
+                        btnResend.textContent = 'Gá»­i láº¡i mÃ£ OTP';
+                        btnResend.disabled = false;
+                    }
+                }, 1000);
+            } else {
+                alert(data.message);
+                btnResend.disabled = false;
+            }
+        })
+        .catch(error => {
+            alert('CÃ³ lá»—i xáº£y ra khi gá»­i láº¡i OTP');
+            btnResend.disabled = false;
+        });
+    }
+
+    // Auto-focus Ã´ Ä‘áº§u tiÃªn
+    otpInputs[0].focus();
+</script>

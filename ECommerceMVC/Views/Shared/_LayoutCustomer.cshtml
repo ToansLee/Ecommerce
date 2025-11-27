@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<title>@ViewBag.Title</title>
+	<meta charset="utf-8">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+
+	<!-- Google Web Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+
+	<!-- Icon Font Stylesheet -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+	<!-- Libraries Stylesheet -->
+	<link href="~/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+	<link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+	<!-- Customized Bootstrap Stylesheet -->
+	<link href="~/css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- Template Stylesheet -->
+	<link href="~/css/style.css" rel="stylesheet">
+	
+	<!-- Custom Site Stylesheet -->
+	<link href="~/css/site.css" rel="stylesheet">
+	@RenderSection("Styles", required: false)
+</head>
+<body>
+	<div>
+		<!-- Spinner Start -->
+		<div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+			<div class="spinner-grow text-primary" role="status"></div>
+		</div>
+		<!-- Spinner End -->
+		<!-- Navbar start -->
+		<div class="container-fluid fixed-top" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); padding: 0; box-shadow: 0 2px 10px rgba(255, 149, 0, 0.3);">
+			<div class="container-fluid topbar py-2" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%);">
+				<div class="container px-3">
+					<div class="d-flex justify-content-between align-items-center">
+						<div class="top-info ps-2">
+							<small class="me-3" style="color: white;"><i class="fas fa-map-marker-alt me-2"></i> <a href="#" style="color: white; text-decoration: none;">Địa chỉ: 218 Lĩnh Nam, Hoàng Mai, Hà Nội</a></small>
+							<small class="me-3" style="color: white;"><i class="fas fa-phone me-2"></i><a href="#" style="color: white; text-decoration: none;">Hotline: 09 6269 8288</a></small>
+						</div>
+						<div class="top-link pe-2">
+							<a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none;"><small class="mx-2">Trang chủ</small>/</a>
+							<a asp-action="Index" asp-controller="HangHoa" style="color: white; text-decoration: none;"><small class="mx-2">Thực đơn</small>/</a>
+							<a asp-action="Index" asp-controller="Chat" style="color: white; text-decoration: none;"><small class="ms-2">Liên hệ</small></a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid" style="background: white; padding: 0; border-bottom: 3px solid #FF9500;">
+				<nav class="navbar navbar-light navbar-expand-xl" style="background: white; padding: 0.8rem 0;">
+					<div class="container px-3">
+						<a asp-action="Index" asp-controller="Home" class="navbar-brand" style="margin-right: 3rem;"><h1 style="color: #FF9500; margin: 0; font-size: 1.8rem; font-weight: 700;">🍔 FoodHub</h1></a>
+						<button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" style="border-color: #FF9500;">
+							<span class="fa fa-bars" style="color: #FF9500;"></span>
+						</button>
+						<div class="collapse navbar-collapse" id="navbarCollapse">
+							<div class="navbar-nav">
+								<a asp-action="Index" asp-controller="Home" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">Trang chủ</a>
+								<a asp-controller="HangHoa" asp-action="Index" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "HangHoa" ? "active" : "")">Thực đơn</a>
+								
+								@if (User.Identity?.IsAuthenticated != true)
+								{
+									<a asp-controller="KhachHang" asp-action="DangKy" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "KhachHang" && ViewContext.RouteData.Values["Action"]?.ToString() == "DangKy" ? "active" : "")">Đăng ký</a>
+								<a asp-controller="KhachHang" asp-action="DangNhap" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "KhachHang" && ViewContext.RouteData.Values["Action"]?.ToString() == "DangNhap" ? "active" : "")">Đăng nhập</a>
+							}
+							
+							<a asp-controller="Chat" asp-action="Index" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chat" ? "active" : "")">Liên hệ</a>
+						</div>
+						<div class="d-flex m-3 me-0 ms-auto align-items-center">
+							<button class="btn-search btn border btn-md-square rounded-circle me-4" data-bs-toggle="modal" data-bs-target="#searchModal" style="background-color: #FFF4E6; border-color: #FFE5CC !important;"><i class="fas fa-search" style="color: #FF9500;"></i></button>								@* Chỉ hiện giỏ hàng cho Customer *@
+								@if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Seller"))
+								{
+									@await Component.InvokeAsync("Cart")
+								}
+
+								@if (User.Identity?.IsAuthenticated == true)
+								{
+									<div class="dropdown">
+										<a href="#" class="dropdown-toggle d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+											<i class="fas fa-user-circle fa-2x me-2" style="color: #FF9500;"></i>
+											<span style="color: #2C3E50; font-weight: 500;">@User.Identity?.Name</span>
+										</a>
+										<ul class="dropdown-menu dropdown-menu-end m-0 rounded-2" style="background-color: white; border: 1px solid #FFE5CC; box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);">
+											@if (User.IsInRole("Seller"))
+											{
+												<li><a asp-controller="Seller" asp-action="Index" class="dropdown-item navbar-dropdown-item"><i class="fas fa-tachometer-alt me-2" style="color: #FF9500;"></i>Seller Dashboard</a></li>
+												<li><hr class="dropdown-divider" style="border-color: #FFE5CC;"></li>
+											}
+											else
+											{
+												<li><a asp-controller="KhachHang" asp-action="Profile" class="dropdown-item navbar-dropdown-item"><i class="fas fa-user me-2" style="color: #FF9500;"></i>Thông tin tài khoản</a></li>
+												<li><a asp-controller="Order" asp-action="Index" class="dropdown-item navbar-dropdown-item"><i class="fas fa-shopping-bag me-2" style="color: #FF9500;"></i>Lịch sử đơn hàng</a></li>
+												<li><a asp-controller="Chat" asp-action="Index" class="dropdown-item navbar-dropdown-item"><i class="fas fa-comments me-2" style="color: #FF9500;"></i>Chat với người bán</a></li>
+												<li><hr class="dropdown-divider" style="border-color: #FFE5CC;"></li>
+											}
+											<li><a asp-controller="KhachHang" asp-action="DangXuat" class="dropdown-item navbar-dropdown-item"><i class="fas fa-sign-out-alt me-2" style="color: #FF9500;"></i>Đăng xuất</a></li>
+										</ul>
+									</div>
+								}
+								else
+								{
+									<a asp-controller="KhachHang" asp-action="DangNhap" class="my-auto">
+										<i class="fas fa-user fa-2x" style="color: #FF9500;"></i>
+									</a>
+								}
+							</div>
+						</div>
+					</div>
+				</nav>
+			</div>
+		</div>
+		<!-- Navbar End -->
+		<!-- Modal Search Start -->
+		<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-fullscreen">
+				<div class="modal-content rounded-0">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body d-flex align-items-center">
+						<div class="input-group w-75 mx-auto d-flex">
+							<input id="searchText" type="search" class="form-control p-3" placeholder="keywords" aria-describedby="seachButton">
+							<span id="seachButton" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Modal Search End -->
+
+		<div style="min-height:400px;" class="hero-header">
+			@RenderBody()
+		</div>
+
+
+
+		@await Html.PartialAsync("_Footer")
+
+		@await Html.PartialAsync("_Copyright")
+	</div>
+
+	<!-- Back to Top -->
+	<a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+
+	<!-- JavaScript Libraries -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/lib/easing/easing.min.js"></script>
+	<script src="~/lib/waypoints/waypoints.min.js"></script>
+	<script src="~/lib/lightbox/js/lightbox.min.js"></script>
+	<script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+
+	<!-- Template Javascript -->
+	<script src="~/js/main.js"></script>
+	@RenderSection("Scripts", required: false)
+
+	<script>
+		$(document).ready(function () { 
+			$("#seachButton").click(function () { 
+				let url = `/HangHoa/Search?query=` + $("#searchText").val();
+				window.location.href = url;
+			});
+		});
+	</script>
+</body>
+</html>

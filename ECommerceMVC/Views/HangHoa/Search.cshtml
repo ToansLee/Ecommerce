@@ -1,0 +1,82 @@
+@model IEnumerable<ECommerceMVC.ViewModels.HangHoaVM>
+@{
+    ViewData["Title"] = "Search";
+    Layout = "_DanhSachHangHoa";
+}
+
+<h1>Search</h1>
+
+@await Html.PartialAsync("ProductItem", Model)
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Handle Add to Cart button clicks
+			$('.btn.border.border-secondary.rounded-pill').off('click').on('click', function (e) {
+				// Check if this is an add to cart link (has fa-shopping-bag icon)
+				if ($(this).find('.fa-shopping-bag').length > 0) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					var url = $(this).attr('href');
+					var button = $(this);
+					var originalText = button.html();
+
+					// Disable button and show loading state
+					button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-2"></i> Ðang thêm...');
+
+					$.ajax({
+						url: url,
+						type: 'GET',
+						headers: { 'X-Requested-With': 'XMLHttpRequest' },
+						success: function (response) {
+							if (response.success) {
+								// Show success notification
+								var message = $('<div class="alert alert-success alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+									'<i class="fa fa-check-circle me-2"></i>' + response.message +
+									'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+									'</div>');
+								$('body').append(message);
+								setTimeout(function () {
+									message.alert('close');
+								}, 3000);
+
+								// Update cart count
+								if (response.cartCount !== undefined) {
+									$('.cart-count').text(response.cartCount);
+								}
+							} else {
+								// Show error notification
+								var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+									'<i class="fa fa-exclamation-circle me-2"></i>' + response.message +
+									'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+									'</div>');
+								$('body').append(errorMessage);
+								setTimeout(function () {
+									errorMessage.alert('close');
+								}, 3000);
+							}
+
+							// Restore button
+							button.prop('disabled', false).html(originalText);
+						},
+						error: function () {
+							// Show error notification
+							var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
+								'<i class="fa fa-exclamation-circle me-2"></i>Có lỗi xảy ra khi thêm vào giỏ hàng!' +
+								'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+								'</div>');
+							$('body').append(errorMessage);
+							setTimeout(function () {
+								errorMessage.alert('close');
+							}, 3000);
+
+							// Restore button
+							button.prop('disabled', false).html(originalText);
+						}
+					});
+				}
+			});
+		});
+	</script>
+}

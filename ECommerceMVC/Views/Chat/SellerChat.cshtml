@@ -1,0 +1,178 @@
+@model List<ECommerceMVC.Models.Customer>
+@{
+    ViewData["Title"] = "Quản lý tin nhắn";
+    Layout = "_LayoutSeller";
+}
+
+<div class="container-fluid py-4">
+    <h2 style="color: #FF9500;"><i class="fas fa-comments me-2"></i>Quản lý tin nhắn</h2>
+
+    <div class="row mt-4">
+        <!-- Customer List -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 15px; height: 600px;">
+                <div class="card-header" style="background-color: #FFF4E6; border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0" style="color: #FF9500;">Danh sách khách hàng</h5>
+                </div>
+                <div class="card-body p-0" style="overflow-y: auto;">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                            <p>Chưa có tin nhắn nào</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var customer in Model)
+                            {
+                                <a href="javascript:void(0)" 
+                                   class="list-group-item list-group-item-action customer-item" 
+                                   data-customer-id="@customer.Id"
+                                   data-customer-name="@customer.FullName">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-circle fa-2x me-3" style="color: #FF9500;"></i>
+                                        <div>
+                                            <h6 class="mb-0">@customer.FullName</h6>
+                                            <small class="text-muted">@customer.Email</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 15px; height: 600px; display: flex; flex-direction: column;">
+                <!-- Chat Header -->
+                <div class="card-header" id="chatHeader" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border-radius: 15px 15px 0 0; padding: 20px; display: none;">
+                    <h5 class="text-white mb-0">
+                        <i class="fas fa-user-circle me-2"></i><span id="selectedCustomerName"></span>
+                    </h5>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="card-body" id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; background-color: #F8F9FA;">
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-comments fa-3x mb-3"></i>
+                        <p>Chọn khách hàng để bắt đầu trò chuyện</p>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="card-footer" id="chatFooter" style="background-color: white; border-top: 1px solid #dee2e6; border-radius: 0 0 15px 15px; padding: 15px; display: none;">
+                    <form id="chatForm" class="d-flex gap-2">
+                        <input type="hidden" id="receiverId">
+                        <input type="text" id="messageInput" class="form-control" placeholder="Nhập tin nhắn..." style="border-radius: 25px; border: 2px solid #FFE5CC;" required>
+                        <button type="submit" class="btn text-white" style="background-color: #FF9500; border: none; border-radius: 25px; padding: 0.5rem 2rem; white-space: nowrap;">
+                            <i class="fas fa-paper-plane me-1"></i> Gửi
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let currentCustomerId = null;
+            let refreshInterval = null;
+            const currentUserId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+
+            // Select customer
+            $('.customer-item').on('click', function() {
+                $('.customer-item').removeClass('active');
+                $(this).addClass('active');
+                
+                currentCustomerId = $(this).data('customer-id');
+                const customerName = $(this).data('customer-name');
+                
+                $('#receiverId').val(currentCustomerId);
+                $('#selectedCustomerName').text(customerName);
+                $('#chatHeader').show();
+                $('#chatFooter').show();
+                
+                loadMessages();
+                
+                // Clear old interval and set new one
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                }
+                refreshInterval = setInterval(loadMessages, 3000);
+            });
+
+            // Load messages
+            function loadMessages() {
+                if (!currentCustomerId) return;
+
+                $.ajax({
+                    url: '@Url.Action("GetMessages", "Chat")',
+                    type: 'GET',
+                    data: { otherUserId: currentCustomerId },
+                    success: function(messages) {
+                        if (messages.length === 0) {
+                            $('#chatMessages').html(`
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <p>Chưa có tin nhắn nào</p>
+                                </div>
+                            `);
+                        } else {
+                            let html = '';
+                            messages.forEach(function(msg) {
+                                const isMe = msg.senderId == currentUserId;
+                                const alignClass = isMe ? 'justify-content-end' : 'justify-content-start';
+                                const bgColor = isMe ? '#FF9500' : '#E9ECEF';
+                                const textColor = isMe ? 'white' : '#2C3E50';
+                                
+                                html += `
+                                    <div class="d-flex ${alignClass} mb-3">
+                                        <div style="max-width: 70%;">
+                                            ${!isMe ? `<small class="text-muted ms-2"><strong>${msg.senderName}</strong></small>` : ''}
+                                            <div class="p-3 rounded-3" style="background-color: ${bgColor}; color: ${textColor};">
+                                                <p class="mb-1">${msg.message}</p>
+                                                <small style="opacity: 0.8; font-size: 0.75rem;">${msg.sentAt}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            $('#chatMessages').html(html);
+                            $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
+                        }
+                    }
+                });
+            }
+
+            // Send message
+            $('#chatForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const message = $('#messageInput').val().trim();
+                if (!message) return;
+
+                $.ajax({
+                    url: '@Url.Action("SendMessage", "Chat")',
+                    type: 'POST',
+                    data: {
+                        receiverId: currentCustomerId,
+                        message: message
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#messageInput').val('');
+                            loadMessages();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

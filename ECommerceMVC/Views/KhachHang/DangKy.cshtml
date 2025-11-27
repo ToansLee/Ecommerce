@@ -1,0 +1,152 @@
+@model ECommerceMVC.ViewModels.RegisterVM
+@{
+	ViewData["Title"] = "Đăng ký";
+}
+
+<!-- Page Header -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+	<h1 class="text-center text-white display-6">🍔 Đăng Ký</h1>
+	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
+		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Đăng ký</li>
+	</ol>
+</div>
+
+<!-- Register Form -->
+<div class="container-fluid py-5" style="background: linear-gradient(to bottom, #FFF8F0 0%, #FFFFFF 100%);">
+	<div class="container py-5">
+		<div class="row justify-content-center">
+			<div class="col-lg-7 col-md-9">
+				<!-- Card Container -->
+				<div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+					<!-- Card Header -->
+					<div class="card-header text-center py-4" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border: none;">
+						<h3 class="text-white mb-0" style="font-weight: 600;">
+							<i class="fas fa-user-plus me-2"></i>Tạo Tài Khoản Mới
+						</h3>
+						<p class="text-white mb-0 mt-2" style="opacity: 0.9; font-size: 0.95rem;">Đăng ký để bắt đầu đặt món</p>
+					</div>
+
+					<!-- Card Body -->
+					<div class="card-body p-5" style="background-color: #FFFFFF;">
+					<form asp-action="DangKy" method="post">
+							<div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6 mb-4">
+									<label asp-for="MaKh" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-user me-2" style="color: #FF9500;"></i>Tên đăng nhập <span class="text-danger">*</span>
+									</label>
+									<input asp-for="MaKh" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập tên đăng nhập">
+									<span asp-validation-for="MaKh" class="text-danger small"></span>
+								</div>
+
+								<div class="col-md-6 mb-4">
+									<label asp-for="HoTen" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-id-card me-2" style="color: #FF9500;"></i>Họ và tên <span class="text-danger">*</span>
+									</label>
+									<input asp-for="HoTen" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập họ và tên">
+									<span asp-validation-for="HoTen" class="text-danger small"></span>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6 mb-4">
+									<label asp-for="MatKhau" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-lock me-2" style="color: #FF9500;"></i>Mật khẩu <span class="text-danger">*</span>
+									</label>
+									<input asp-for="MatKhau" type="password" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập mật khẩu">
+									<span asp-validation-for="MatKhau" class="text-danger small"></span>
+								</div>
+
+								<div class="col-md-6 mb-4">
+									<label for="MatKhauXacNhan" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-key me-2" style="color: #FF9500;"></i>Xác nhận mật khẩu <span class="text-danger">*</span>
+									</label>
+									<input type="password" id="MatKhauXacNhan" name="MatKhauXacNhan" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập lại mật khẩu">
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6 mb-4">
+									<label asp-for="Email" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-envelope me-2" style="color: #FF9500;"></i>Email <span class="text-danger">*</span>
+									</label>
+									<input asp-for="Email" type="email" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập email">
+									<span asp-validation-for="Email" class="text-danger small"></span>
+								</div>
+
+								<div class="col-md-6 mb-4">
+									<label asp-for="DienThoai" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-phone me-2" style="color: #FF9500;"></i>Điện thoại <span class="text-danger">*</span>
+									</label>
+									<input asp-for="DienThoai" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập số điện thoại">
+									<span asp-validation-for="DienThoai" class="text-danger small"></span>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6 mb-4">
+									<label asp-for="NgaySinh" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-calendar me-2" style="color: #FF9500;"></i>Ngày sinh
+									</label>
+									<input asp-for="NgaySinh" type="date" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'">
+									<span asp-validation-for="NgaySinh" class="text-danger small"></span>
+								</div>
+
+								<div class="col-md-6 mb-4">
+									<label asp-for="GioiTinh" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+										<i class="fas fa-venus-mars me-2" style="color: #FF9500;"></i>Giới tính
+									</label>
+									<select asp-for="GioiTinh" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'">
+										<option value="">-- Chọn giới tính --</option>
+										<option value="true">Nam</option>
+										<option value="false">Nữ</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="mb-4">
+								<label asp-for="DiaChi" class="form-label" style="font-weight: 500; color: #2C3E50; font-size: 1rem;">
+									<i class="fas fa-map-marker-alt me-2" style="color: #FF9500;"></i>Địa chỉ
+								</label>
+								<textarea asp-for="DiaChi" class="form-control form-control-lg" rows="3" style="border: 2px solid #FFE5CC; border-radius: 10px; padding: 15px 20px; font-size: 1rem; transition: all 0.3s;" onfocus="this.style.borderColor='#FF9500'; this.style.boxShadow='0 0 0 0.2rem rgba(255, 149, 0, 0.15)'" onblur="this.style.borderColor='#FFE5CC'; this.style.boxShadow='none'" placeholder="Nhập địa chỉ"></textarea>
+								<span asp-validation-for="DiaChi" class="text-danger small"></span>
+							</div>
+
+							<div class="text-center mt-4">
+								<button type="submit" class="btn btn-lg w-100 py-3" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border: none; border-radius: 50px; color: white; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(255, 149, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 149, 0, 0.3)'">
+									<i class="fas fa-user-check me-2"></i>Đăng Ký
+								</button>
+							</div>
+
+							<div class="text-center mt-4">
+								<hr style="border-color: #FFE5CC;">
+								<p class="mb-0" style="color: #6C757D;">
+									Đã có tài khoản? 
+									<a asp-controller="KhachHang" asp-action="DangNhap" style="color: #FF9500; font-weight: 600; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+										Đăng nhập ngay
+									</a>
+								</p>
+							</div>
+					</form>
+					</div>
+				</div>
+
+				<!-- Additional Info -->
+				<div class="text-center mt-4">
+					<p style="color: #6C757D; font-size: 0.9rem;">
+						<i class="fas fa-shield-alt me-1" style="color: #FF9500;"></i>
+						Thông tin của bạn được bảo mật tuyệt đối
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

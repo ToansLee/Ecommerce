@@ -1,0 +1,52 @@
+@{
+	Layout = "_LayoutCustomer";
+}
+
+<!-- Single Page Header start -->
+@RenderSection("BreadCum", required: false)
+<!-- Single Page Header End -->
+<!-- Fruits Shop Start-->
+<div class="container-fluid fruite py-5">
+	<div class="container py-5">
+		<div class="row g-4">
+			<div class="col-lg-12">
+				<div class="row g-4">
+					<div class="col-lg-3">
+						<div class="row g-4">
+							@await Component.InvokeAsync("MenuLoai")
+							<div class="col-lg-12">
+								@await Html.PartialAsync("_TimKiemPanel")
+							</div>
+							<div class="col-lg-12">
+								<form method="get" asp-action="Index" asp-controller="HangHoa">
+									<div class="mb-3">
+										<h4 class="mb-3">Khoảng giá</h4>
+										<div class="mb-2">
+											<input type="number" class="form-control" name="minPrice" placeholder="Giá thấp nhất" min="0">
+										</div>
+										<div class="mb-2">
+											<input type="number" class="form-control" name="maxPrice" placeholder="Giá cao nhất" min="0">
+										</div>
+										<div>
+											<button type="submit" class="btn btn-warning w-100">Lọc giá</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-9">
+						<div class="row g-4 justify-content-center">
+							@RenderBody()
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Fruits Shop End-->
+
+@section Scripts {
+	@RenderSection("Scripts", required: false)
+}

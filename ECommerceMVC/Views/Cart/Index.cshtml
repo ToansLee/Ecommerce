@@ -1,0 +1,250 @@
+@model IEnumerable<ECommerceMVC.ViewModels.CartItem>
+@{
+	ViewData["Title"] = "Gi? h�ng";
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+	<h1 class="text-center text-white display-6">Gi? h�ng</h1>
+	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
+		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="HangHoa" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Thực đơn</a></li>
+		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Gi? h�ng</li>
+	</ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+	<div class="container py-5">
+		<div class="table-responsive">
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">H�nh ?nh</th>
+						<th scope="col">T�n s?n ph?m</th>
+						<th scope="col">�on gi�</th>
+						<th scope="col">S? lu?ng</th>
+						<th scope="col">Th�nh ti?n</th>
+						<th scope="col">Thao t�c</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<th scope="row">
+								<div class="d-flex align-items-center">
+									<img src="~/Hinh/HangHoa/@item.Hinh" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="@item.TenHH">
+								</div>
+							</th>
+							<td>
+								<p class="mb-0 mt-4">
+									<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
+										@item.TenHH
+									</a>
+								</p>
+							</td>
+							<td>
+								<p class="mb-0 mt-4">@item.DonGia.ToString("N0") VN�</p>
+							</td>
+						<td>
+							<div class="input-group quantity mt-4" style="width: 100px;" data-product-id="@item.MaHh" data-price="@item.DonGia">
+								<div class="input-group-btn">
+									<button class="btn btn-sm cart-btn-minus rounded-circle bg-light border" type="button">
+										<i class="fa fa-minus"></i>
+									</button>
+								</div>
+								<input type="text" class="form-control form-control-sm text-center border-0 quantity-input" value="@item.SoLuong" readonly>
+								<div class="input-group-btn">
+									<button class="btn btn-sm cart-btn-plus rounded-circle bg-light border" type="button">
+										<i class="fa fa-plus"></i>
+									</button>
+								</div>
+							</div>
+						</td>
+							<td>
+								<p class="mb-0 mt-4 item-total">@item.ThanhTien.ToString("N0") VN�</p>
+							</td>
+						<td>
+							<button type="button" class="btn btn-md rounded-circle bg-light border mt-4 btn-remove-item" data-product-id="@item.MaHh">
+								<i class="fa fa-times text-danger"></i>
+							</button>
+						</td>						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		<div class="row g-4 justify-content-center mt-5">
+			<div class="col-sm-10 col-md-8 col-lg-6">
+				<div class="bg-light rounded">
+					<div class="p-4">
+						<h1 class="display-6 mb-4 text-center">T?ng <span class="fw-normal">don h�ng</span></h1>
+						<div class="d-flex justify-content-between mb-4">
+							<h5 class="mb-0 me-4">T?m t�nh:</h5>
+							<p class="mb-0 cart-subtotal">@Model.Sum(p => p.ThanhTien).ToString("N0") VN�</p>
+						</div>
+						<div class="d-flex justify-content-between">
+							<h5 class="mb-0 me-4">Ph� v?n chuy?n:</h5>
+							<p class="mb-0 shipping-fee">@{
+								var currentSubtotal = Model.Sum(p => p.ThanhTien);
+								var currentShippingFee = currentSubtotal > 0 ? (currentSubtotal >= 500000 ? 0 : 35000) : 0;
+							}@(currentShippingFee == 0 ? "Mi?n ph�" : currentShippingFee.ToString("N0") + " VN�")</p>
+						</div>
+					</div>
+					<div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
+						<h5 class="mb-0 ps-4 me-4">T?ng c?ng:</h5>
+						<p class="mb-0 pe-4 fw-bold cart-total">@{
+							var subtotal = Model.Sum(p => p.ThanhTien);
+							var shippingFee = subtotal > 0 ? (subtotal >= 500000 ? 0 : 35000) : 0;
+							var total = subtotal + shippingFee;
+						}@total.ToString("N0") VN�</p>
+					</div>
+					<div class="text-center mb-4">
+						@if (User.Identity?.IsAuthenticated == true)
+						{
+							<a asp-action="Index" asp-controller="Checkout" class="btn text-white rounded-pill px-5 py-3 text-uppercase" style="background-color: #FF9500; border: none; font-weight: 600;">
+								<i class="fa fa-credit-card me-2"></i>Thanh to�n
+							</a>
+						}
+						else
+						{
+							<a asp-action="DangNhap" asp-controller="KhachHang" class="btn text-white rounded-pill px-5 py-3 text-uppercase" style="background-color: #FF9500; border: none; font-weight: 600;">
+								<i class="fa fa-sign-in-alt me-2"></i>�ang nh?p d? thanh to�n
+							</a>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Cart Page End -->
+
+@section Scripts {
+	<script>
+		$(document).ready(function() {
+			// Handle quantity increase
+			$('.cart-btn-plus').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				
+				var container = $(this).closest('.quantity');
+				var input = container.find('.quantity-input');
+				var productId = container.data('product-id');
+				var price = parseFloat(container.data('price'));
+				var currentQty = parseInt(input.val()) || 0;
+				var newQty = currentQty + 1;
+
+				updateQuantity(productId, newQty, container, price);
+			});
+
+			// Handle quantity decrease
+			$('.cart-btn-minus').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				
+				var container = $(this).closest('.quantity');
+				var input = container.find('.quantity-input');
+				var productId = container.data('product-id');
+				var price = parseFloat(container.data('price'));
+				var currentQty = parseInt(input.val()) || 0;
+				
+				if (currentQty > 1) {
+					var newQty = currentQty - 1;
+					updateQuantity(productId, newQty, container, price);
+				}
+			});
+
+			// Handle remove item
+			$('.btn-remove-item').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				
+				if (!confirm('B?n c� ch?c mu?n x�a s?n ph?m n�y kh?i gi? h�ng?')) {
+					return;
+				}
+
+				var productId = $(this).data('product-id');
+				var row = $(this).closest('tr');
+
+				$.ajax({
+					url: '@Url.Action("RemoveCart", "Cart")',
+					type: 'POST',
+					data: { id: productId },
+					success: function(response) {
+						if (response.success) {
+							// Remove row from table
+							row.fadeOut(300, function() {
+								$(this).remove();
+								
+								// Check if cart is empty
+								if ($('tbody tr').length === 0) {
+									location.reload();
+								}
+							});
+							
+							// Update cart totals
+							updateCartTotals(response.cartTotal, response.shippingFee);
+							
+							// Update cart icon count
+							if (response.cartCount !== undefined) {
+								$('.cart-count').text(response.cartCount);
+							}
+						} else {
+							alert(response.message || 'C� l?i x?y ra!');
+						}
+					},
+					error: function() {
+						alert('C� l?i x?y ra khi x�a s?n ph?m!');
+					}
+				});
+			});
+
+			function updateQuantity(productId, newQty, container, price) {
+				$.ajax({
+					url: '@Url.Action("UpdateQuantity", "Cart")',
+					type: 'POST',
+					data: { id: productId, quantity: newQty },
+					success: function(response) {
+						if (response.success) {
+							// Update quantity input
+							container.find('.quantity-input').val(newQty);
+							
+							// Update item total
+							var itemTotal = newQty * price;
+							container.closest('tr').find('.item-total').text(itemTotal.toLocaleString('vi-VN') + ' VN�');
+							
+							// Update cart totals
+							updateCartTotals(response.cartTotal, response.shippingFee);
+							
+							// Update cart icon count
+							if (response.cartCount !== undefined) {
+								$('.cart-count').text(response.cartCount);
+							}
+						} else {
+							alert(response.message || 'C� l?i x?y ra!');
+						}
+					},
+					error: function() {
+						alert('C� l?i x?y ra khi c?p nh?t s? lu?ng!');
+					}
+				});
+			}
+
+			function updateCartTotals(subtotal, shippingFee) {
+				$('.cart-subtotal').text(subtotal.toLocaleString('vi-VN') + ' VN�');
+				
+				// Update shipping fee
+				if (subtotal === 0 || shippingFee === 0) {
+					$('.shipping-fee').text('Mi?n ph�');
+				} else {
+					$('.shipping-fee').text(shippingFee.toLocaleString('vi-VN') + ' VN�');
+				}
+				
+				// Update total
+				var total = subtotal + shippingFee;
+				$('.cart-total').text(total.toLocaleString('vi-VN') + ' VN�');
+			}
+		});
+	</script>
+}

@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Chat với người bán";
+    var sellerId = ViewBag.SellerId;
+    var sellerName = ViewBag.SellerName;
+}
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+    <h1 class="text-center text-white display-6">Chat với người bán</h1>
+</div>
+<!-- Single Page Header End -->
+
+<!-- Chat Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm" style="border-radius: 15px; height: 600px; display: flex; flex-direction: column;">
+                    <!-- Chat Header -->
+                    <div class="card-header" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border-radius: 15px 15px 0 0; padding: 20px;">
+                        <h5 class="text-white mb-0">
+                            <i class="fas fa-user-circle me-2"></i>@sellerName
+                        </h5>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div class="card-body" id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; background-color: #F8F9FA;">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-comments fa-3x mb-3"></i>
+                            <p>Bắt đầu cuộc trò chuyện với người bán</p>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="card-footer" style="background-color: white; border-top: 1px solid #dee2e6; border-radius: 0 0 15px 15px; padding: 15px;">
+                        <form id="chatForm" class="d-flex gap-2">
+                            <input type="hidden" id="receiverId" value="@sellerId">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Nhập tin nhắn..." style="border-radius: 25px; border: 2px solid #FFE5CC;" required>
+                            <button type="submit" class="btn text-white" style="background-color: #FF9500; border: none; border-radius: 25px; padding: 0.5rem 2rem; white-space: nowrap;">
+                                <i class="fas fa-paper-plane me-1"></i> Gửi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Chat End -->
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const receiverId = $('#receiverId').val();
+            const chatMessages = $('#chatMessages');
+            const currentUserId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+
+            // Load messages
+            function loadMessages() {
+                $.ajax({
+                    url: '@Url.Action("GetMessages", "Chat")',
+                    type: 'GET',
+                    data: { otherUserId: receiverId },
+                    success: function(messages) {
+                        if (messages.length === 0) {
+                            chatMessages.html(`
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <p>Bắt đầu cuộc trò chuyện với người bán</p>
+                                </div>
+                            `);
+                        } else {
+                            let html = '';
+                            messages.forEach(function(msg) {
+                                const isMe = msg.senderId == currentUserId;
+                                const alignClass = isMe ? 'justify-content-end' : 'justify-content-start';
+                                const bgColor = isMe ? '#FF9500' : '#E9ECEF';
+                                const textColor = isMe ? 'white' : '#2C3E50';
+                                
+                                html += `
+                                    <div class="d-flex ${alignClass} mb-3">
+                                        <div style="max-width: 70%;">
+                                            ${!isMe ? `<small class="text-muted ms-2"><strong>${msg.senderName}</strong></small>` : ''}
+                                            <div class="p-3 rounded-3" style="background-color: ${bgColor}; color: ${textColor};">
+                                                <p class="mb-1">${msg.message}</p>
+                                                <small style="opacity: 0.8; font-size: 0.75rem;">${msg.sentAt}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            chatMessages.html(html);
+                            chatMessages.scrollTop(chatMessages[0].scrollHeight);
+                        }
+                    },
+                    error: function() {
+                        console.error('Error loading messages');
+                    }
+                });
+            }
+
+            // Send message
+            $('#chatForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const message = $('#messageInput').val().trim();
+                if (!message) return;
+
+                $.ajax({
+                    url: '@Url.Action("SendMessage", "Chat")',
+                    type: 'POST',
+                    data: {
+                        receiverId: receiverId,
+                        message: message
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#messageInput').val('');
+                            loadMessages();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Có lỗi xảy ra khi gửi tin nhắn!');
+                    }
+                });
+            });
+
+            // Initial load and auto refresh every 3 seconds
+            loadMessages();
+            setInterval(loadMessages, 3000);
+        });
+    </script>
+}
