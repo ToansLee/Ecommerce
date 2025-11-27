@@ -38,16 +38,18 @@
 		<div class="container-fluid" style="background: white; padding: 0; border-bottom: 3px solid #FF9500;">
 			<nav class="navbar navbar-light navbar-expand-xl" style="background: white; padding: 0.8rem 0;">
 				<div class="container px-3">
-					<a asp-action="Index" asp-controller="Seller" class="navbar-brand"><h1 style="color: #FF9500; margin: 0; font-size: 1.8rem; font-weight: 700;"><i class="fas fa-cogs me-2" style="color: #FF9500;"></i>Admin Panel</h1></a>
+					<a asp-action="Index" asp-controller="Admin" class="navbar-brand"><h1 style="color: #FF9500; margin: 0; font-size: 1.8rem; font-weight: 700;"><i class="fas fa-cogs me-2" style="color: #FF9500;"></i>Admin Panel</h1></a>
 					<button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
 						<span class="fa fa-bars" style="color: #FF9500;"></span>
 					</button>
 					<div class="collapse navbar-collapse" id="navbarCollapse">
 						<div class="navbar-nav">
-							<a asp-action="Index" asp-controller="Seller" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
-							<a asp-action="Orders" asp-controller="Seller" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Orders" || ViewContext.RouteData.Values["Action"]?.ToString() == "OrderDetails" ? "active" : "")"><i class="fas fa-shopping-bag me-1"></i>Đơn hàng</a>
-							<a asp-action="MenuItems" asp-controller="Seller" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "MenuItems" || ViewContext.RouteData.Values["Action"]?.ToString() == "CreateMenuItem" || ViewContext.RouteData.Values["Action"]?.ToString() == "EditMenuItem" ? "active" : "")"><i class="fas fa-utensils me-1"></i>Sản phẩm</a>
-							<a asp-action="Index" asp-controller="Chat" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chat" ? "active" : "")"><i class="fas fa-comments me-1"></i>Tin nhắn</a>
+							<a asp-action="Index" asp-controller="Admin" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+							<a asp-action="Orders" asp-controller="Admin" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Orders" || ViewContext.RouteData.Values["Action"]?.ToString() == "OrderDetails" ? "active" : "")"><i class="fas fa-shopping-bag me-1"></i>Đơn hàng</a>
+							<a asp-action="MenuItems" asp-controller="Admin" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "MenuItems" || ViewContext.RouteData.Values["Action"]?.ToString() == "CreateMenuItem" || ViewContext.RouteData.Values["Action"]?.ToString() == "EditMenuItem" ? "active" : "")"><i class="fas fa-utensils me-1"></i>Sản phẩm</a>
+							<a asp-action="Customers" asp-controller="Admin" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Customers" || ViewContext.RouteData.Values["Action"]?.ToString() == "CustomerDetails" ? "active" : "")"><i class="fas fa-users me-1"></i>Khách hàng</a>
+							<a asp-action="Revenue" asp-controller="Admin" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Revenue" ? "active" : "")"><i class="fas fa-chart-line me-1"></i>Doanh thu</a>
+							<a asp-action="AdminChat" asp-controller="Admin" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "AdminChat" ? "active" : "")"><i class="fas fa-comments me-1"></i>Tin nhắn</a>
 						</div>
 						<div class="d-flex m-3 me-0 ms-auto align-items-center">
 							<div class="dropdown">
@@ -56,8 +58,6 @@
 									<span style="color: #2C3E50; font-weight: 500;">@User.Identity?.Name</span>
 								</a>
 								<ul class="dropdown-menu dropdown-menu-end m-0 rounded-2" style="background-color: white; border: 1px solid #FFE5CC; box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);">
-									<li><a asp-controller="KhachHang" asp-action="Profile" class="dropdown-item navbar-dropdown-item"><i class="fas fa-user me-2" style="color: #FF9500;"></i>Thông tin tài khoản</a></li>
-									<li><hr class="dropdown-divider" style="border-color: #FFE5CC;"></li>
 									<li><a asp-controller="KhachHang" asp-action="DangXuat" class="dropdown-item navbar-dropdown-item"><i class="fas fa-sign-out-alt me-2" style="color: #E74C3C;"></i>Đăng xuất</a></li>
 								</ul>
 							</div>

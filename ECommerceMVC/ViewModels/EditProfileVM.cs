@@ -17,6 +17,17 @@ namespace ECommerceMVC.ViewModels
 		[Display(Name = "Số điện thoại")]
 		[Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
 		public string Phone { get; set; } = string.Empty;
+
+		[Display(Name = "Giới tính")]
+		public bool Gender { get; set; }
+
+		[Display(Name = "Ngày sinh")]
+		[DataType(DataType.Date)]
+		public DateTime? DateOfBirth { get; set; }
+
+		[Display(Name = "Địa chỉ")]
+		[StringLength(200, ErrorMessage = "Địa chỉ không được vượt quá 200 ký tự")]
+		public string? Address { get; set; }
 	}
 
 	public class ChangePasswordVM

@@ -1,0 +1,200 @@
+@model IEnumerable<ECommerceMVC.Models.Customer>
+
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 style="color: #FF9500; font-weight: 600; margin: 0;">
+                        <i class="fas fa-users me-2"></i>Quản lý khách hàng
+                    </h2>
+                    <p class="text-muted mb-0">Tổng số: @ViewBag.TotalCustomers khách hàng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc và tìm kiếm -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form asp-action="Customers" method="get" class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Tìm kiếm</label>
+                            <input type="text" name="searchString" class="form-control" placeholder="Tên, email, số điện thoại..." value="@ViewBag.SearchString">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select name="status" class="form-select">
+                                <option value="">Tất cả</option>
+                                <option value="active" selected="@(ViewBag.Status == "active")">Đang hoạt động</option>
+                                <option value="inactive" selected="@(ViewBag.Status == "inactive")">Đã khóa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Tìm kiếm
+                            </button>
+                            <a asp-action="Customers" class="btn btn-secondary">
+                                <i class="fas fa-redo me-1"></i>Làm mới
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách khách hàng -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); color: white;">
+                                    <tr>
+                                        <th class="ps-4">ID</th>
+                                        <th>Thông tin khách hàng</th>
+                                        <th>Liên hệ</th>
+                                        <th class="text-center">Số đơn hàng</th>
+                                        <th class="text-center">Ngày đăng ký</th>
+                                        <th class="text-center">Trạng thái</th>
+                                        <th class="text-center pe-4">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var customer in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 align-middle">
+                                                <strong>#@customer.Id</strong>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div>
+                                                    <strong>@customer.FullName</strong>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-user me-1"></i>@customer.UserName
+                                                    </small>
+                                                </div>
+                                            </td>
+                                            <td class="align-middle">
+                                                <div>
+                                                    <small>
+                                                        <i class="fas fa-envelope me-1" style="color: #FF9500;"></i>
+                                                        @customer.Email
+                                                    </small>
+                                                    <br>
+                                                    @if (!string.IsNullOrEmpty(customer.Phone))
+                                                    {
+                                                        <small>
+                                                            <i class="fas fa-phone me-1" style="color: #FF9500;"></i>
+                                                            @customer.Phone
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span class="badge bg-primary" style="font-size: 0.9rem;">
+                                                    @customer.Orders.Count
+                                                </span>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <small>@customer.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                @if (customer.IsActive)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-lock me-1"></i>Đã khóa
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center align-middle pe-4">
+                                                <a asp-action="CustomerDetails" asp-route-id="@customer.Id" class="btn btn-sm btn-info me-1" title="Chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button onclick="toggleStatus(@customer.Id, '@customer.FullName', @customer.IsActive.ToString().ToLower())" class="btn btn-sm btn-warning me-1" title="@(customer.IsActive ? "Khóa tài khoản" : "Mở khóa")">
+                                                    <i class="fas fa-@(customer.IsActive ? "lock" : "unlock")"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Phân trang -->
+                        @if (ViewBag.TotalPages > 1)
+                        {
+                            <div class="card-footer bg-white">
+                                <nav>
+                                    <ul class="pagination justify-content-center mb-0">
+                                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                        {
+                                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                                <a class="page-link" asp-action="Customers" asp-route-page="@i" asp-route-searchString="@ViewBag.SearchString" asp-route-status="@ViewBag.Status">
+                                                    @i
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-users" style="font-size: 4rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3">Chưa có khách hàng nào</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleStatus(customerId, customerName, isActive) {
+            const action = isActive ? 'khóa' : 'mở khóa';
+            if (!confirm(`Bạn có chắc muốn ${action} tài khoản của ${customerName}?`)) {
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("ToggleCustomerStatus", "Admin")',
+                type: 'POST',
+                data: { id: customerId },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('Đã xảy ra lỗi khi xử lý yêu cầu');
+                }
+            });
+        }
+    </script>
+}

@@ -284,9 +284,9 @@ namespace ECommerceMVC.Controllers
 						{
 							return Redirect(returnUrl);
 						}
-						else if (khachHang.Role == "Seller")
+						else if (khachHang.Role == "Admin")
 						{
-							return RedirectToAction("Index", "Seller");
+							return RedirectToAction("Index", "Admin");
 						}
 						else
 						{
@@ -319,6 +319,7 @@ namespace ECommerceMVC.Controllers
 
 		var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 		var customer = await db.Customers
+			.Include(c => c.Orders.OrderByDescending(o => o.CreatedAt).Take(10))
 			.FirstOrDefaultAsync(c => c.Id == userId);
 
 		if (customer == null)
@@ -350,7 +351,10 @@ namespace ECommerceMVC.Controllers
 			{
 				FullName = customer.FullName,
 				Email = customer.Email,
-				Phone = customer.Phone ?? string.Empty
+				Phone = customer.Phone ?? string.Empty,
+				Gender = customer.Gender,
+				DateOfBirth = customer.DateOfBirth,
+				Address = customer.Address
 			};
 
 			return View(model);
@@ -383,13 +387,14 @@ namespace ECommerceMVC.Controllers
 						return RedirectToAction("DangNhap");
 					}
 
-					customer.FullName = model.FullName;
-					customer.Email = model.Email;
-					customer.Phone = model.Phone;
+				customer.FullName = model.FullName;
+				customer.Email = model.Email;
+				customer.Phone = model.Phone;
+				customer.Gender = model.Gender;
+				customer.DateOfBirth = model.DateOfBirth;
+				customer.Address = model.Address;
 
-					await db.SaveChangesAsync();
-
-					// Cập nhật lại Claims với tên mới
+				await db.SaveChangesAsync();					// Cập nhật lại Claims với tên mới
 					await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
 					var claims = new List<Claim>

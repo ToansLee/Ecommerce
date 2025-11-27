@@ -1,7 +1,7 @@
 @model ECommerceMVC.Models.Customer
 @{
-    ViewData["Title"] = "ThÃ´ng tin tÃ i khoáº£n";
-    Layout = User.IsInRole("Seller") ? "_LayoutSeller" : "_LayoutCustomer";
+    ViewData["Title"] = "Thông tin tài khoản";
+    Layout = User.IsInRole("Admin") ? "_LayoutAdmin" : "_LayoutCustomer";
 }
 
 <style>
@@ -183,7 +183,7 @@
 <div class="page-header-profile">
     <div class="container">
         <div class="text-center">
-            <h1 class="display-4 text-white mb-3">ThÃ´ng tin tÃ i khoáº£n</h1>
+            <h1 class="display-4 text-white mb-3">Thông tin tài khoản</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-center mb-0" style="background: transparent;">
                     @if (User.IsInRole("Seller"))
@@ -192,9 +192,9 @@
                     }
                     else
                     {
-                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Trang chá»§</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Trang chủ</a></li>
                     }
-                    <li class="breadcrumb-item text-white" aria-current="page" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">ThÃ´ng tin tÃ i khoáº£n</li>
+                    <li class="breadcrumb-item text-white" aria-current="page" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Thông tin tài khoản</li>
                 </ol>
             </nav>
         </div>
@@ -220,22 +220,22 @@
             <div class="profile-role">
                 @if (Model.Role == "Seller")
                 {
-                    <i class="fas fa-store"></i> @:NgÆ°á»i bÃ¡n
+                    <i class="fas fa-store"></i> @:Người bán
                 }
                 else
                 {
-                    <i class="fas fa-user"></i> @:KhÃ¡ch hÃ ng
+                    <i class="fas fa-user"></i> @:Khách hàng
                 }
             </div>
         </div>
 
         <!-- Profile Body -->
         <div class="profile-body">
-            <!-- ThÃ´ng tin cÆ¡ báº£n -->
+            <!-- Thông tin cơ bản -->
             <div class="profile-section">
                 <div class="profile-section-title">
                     <i class="fas fa-user-circle" style="font-size: 22px;"></i>
-                    <span>ThÃ´ng tin cÆ¡ báº£n</span>
+                    <span>Thông tin cơ bản</span>
                 </div>
                 <div class="info-row">
                     <div class="info-label">
@@ -247,51 +247,51 @@
                 <div class="info-row">
                     <div class="info-label">
                         <i class="fas fa-phone"></i>
-                        <span>Sá»‘ Ä‘iá»‡n thoáº¡i</span>
+                        <span>Số điện thoại</span>
                     </div>
-                    <div class="info-value">@(Model.Phone ?? "ChÆ°a cáº­p nháº­t")</div>
+                    <div class="info-value">@(Model.Phone ?? "Chưa cập nhật")</div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">
                         <i class="fas fa-venus-mars"></i>
-                        <span>Giá»›i tÃ­nh</span>
+                        <span>Giới tính</span>
                     </div>
-                    <div class="info-value">@(Model.Gender ? "Nam" : "Ná»¯")</div>
+                    <div class="info-value">@(Model.Gender ? "Nam" : "Nữ")</div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">
                         <i class="fas fa-birthday-cake"></i>
-                        <span>NgÃ y sinh</span>
+                        <span>Ngày sinh</span>
                     </div>
-                    <div class="info-value">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "ChÆ°a cáº­p nháº­t")</div>
+                    <div class="info-value">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>Äá»‹a chá»‰</span>
+                        <span>Địa chỉ</span>
                     </div>
-                    <div class="info-value">@(Model.Address ?? "ChÆ°a cáº­p nháº­t")</div>
+                    <div class="info-value">@(Model.Address ?? "Chưa cập nhật")</div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">
                         <i class="fas fa-calendar-alt"></i>
-                        <span>NgÃ y tham gia</span>
+                        <span>Ngày tham gia</span>
                     </div>
                     <div class="info-value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">
                         <i class="fas fa-toggle-on"></i>
-                        <span>Tráº¡ng thÃ¡i</span>
+                        <span>Trạng thái</span>
                     </div>
                     <div class="info-value">
                         @if (Model.IsActive)
                         {
-                            <span class="badge bg-success">Äang hoáº¡t Ä‘á»™ng</span>
+                            <span class="badge bg-success">Đang hoạt động</span>
                         }
                         else
                         {
-                            <span class="badge bg-danger">ÄÃ£ khÃ³a</span>
+                            <span class="badge bg-danger">Đã khóa</span>
                         }
                     </div>
                 </div>
@@ -300,12 +300,85 @@
             <div class="action-buttons">
                 <a asp-action="EditProfile" class="btn btn-custom btn-edit">
                     <i class="fas fa-edit"></i>
-                    <span>Chá»‰nh sá»­a thÃ´ng tin</span>
+                    <span>Chỉnh sửa thông tin</span>
                 </a>
                 <a asp-action="ChangePassword" class="btn btn-custom btn-password">
                     <i class="fas fa-lock"></i>
-                    <span>Äá»•i máº­t kháº©u</span>
+                    <span>Đổi mật khẩu</span>
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lịch sử đơn hàng -->
+    <div class="profile-card">
+        <div class="profile-body">
+            <div class="profile-section">
+                <div class="profile-section-title">
+                    <i class="fas fa-shopping-bag" style="font-size: 22px;"></i>
+                    <span>Lịch sử đơn hàng gần đây</span>
+                </div>
+                @if (Model.Orders != null && Model.Orders.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead style="background-color: #FFF3E0;">
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Ngày đặt</th>
+                                    <th class="text-end">Tổng tiền</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th class="text-center">Chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.Orders)
+                                {
+                                    <tr>
+                                        <td><strong>#@order.Id</strong></td>
+                                        <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="text-end"><strong>@order.TotalAmount.ToString("N0")đ</strong></td>
+                                        <td class="text-center">
+                                            @switch (order.Status)
+                                            {
+                                                case "Pending":
+                                                    <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                                    break;
+                                                case "Preparing":
+                                                    <span class="badge bg-info">Chuẩn bị món</span>
+                                                    break;
+                                                case "Delivering":
+                                                    <span class="badge bg-primary">Đang giao</span>
+                                                    break;
+                                                case "Delivered":
+                                                    <span class="badge bg-success">Hoàn thành</span>
+                                                    break;
+                                                case "Cancelled":
+                                                    <span class="badge bg-danger">Đã hủy</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm" style="background-color: #FF9500; color: white;">
+                                                <i class="fas fa-eye"></i> Xem
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-bag" style="font-size: 3rem; color: #ccc;"></i>
+                        <p class="text-muted mt-3">Bạn chưa có đơn hàng nào</p>
+                        <a asp-controller="HangHoa" asp-action="Index" class="btn btn-custom btn-edit mt-2">
+                            <i class="fas fa-shopping-cart"></i> Bắt đầu mua sắm
+                        </a>
+                    </div>
+                }
             </div>
         </div>
     </div>

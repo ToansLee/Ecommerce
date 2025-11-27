@@ -1,7 +1,7 @@
 @model ECommerceMVC.Models.MenuItem
 @{
-	ViewData["Title"] = "Sá»­a mÃ³n Äƒn";
-	Layout = "~/Views/Shared/_LayoutSeller.cshtml";
+	ViewData["Title"] = "Sửa món ăn";
+	Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
 <div class="container-fluid py-5" style="background: linear-gradient(to bottom, #FFF8F0 0%, #FFFFFF 100%);">
@@ -11,7 +11,7 @@
 				<div class="card border-0 shadow-sm" style="border-radius: 15px;">
 					<div class="card-header text-center py-4" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border: none; border-radius: 15px 15px 0 0;">
 						<h3 class="text-white mb-0" style="font-weight: 600;">
-							<i class="fas fa-edit me-2"></i>Sá»­a MÃ³n Ä‚n
+							<i class="fas fa-edit me-2"></i>Sửa món ăn
 						</h3>
 					</div>
 					<div class="card-body p-5">
@@ -21,7 +21,7 @@
 
 							<div class="mb-4">
 								<label asp-for="Name" class="form-label" style="font-weight: 500; color: #2C3E50;">
-									<i class="fas fa-signature me-1" style="color: #FF9500;"></i>TÃªn mÃ³n <span style="color: #FF9500;">*</span>
+									<i class="fas fa-signature me-1" style="color: #FF9500;"></i>Tên món <span style="color: #FF9500;">*</span>
 								</label>
 								<input asp-for="Name" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px;">
 								<span asp-validation-for="Name" class="text-danger small"></span>
@@ -29,7 +29,7 @@
 
 							<div class="mb-4">
 								<label asp-for="Description" class="form-label" style="font-weight: 500; color: #2C3E50;">
-									<i class="fas fa-align-left me-1" style="color: #FF9500;"></i>MÃ´ táº£
+									<i class="fas fa-align-left me-1" style="color: #FF9500;"></i>Mô tả
 								</label>
 								<textarea asp-for="Description" class="form-control" rows="4" style="border: 2px solid #FFE5CC; border-radius: 10px;"></textarea>
 							</div>
@@ -37,17 +37,17 @@
 							<div class="row g-3 mb-4">
 								<div class="col-md-6">
 									<label asp-for="Price" class="form-label" style="font-weight: 500; color: #2C3E50;">
-										<i class="fas fa-tag me-1" style="color: #FF9500;"></i>GiÃ¡ <span style="color: #FF9500;">*</span>
+										<i class="fas fa-tag me-1" style="color: #FF9500;"></i>Giá <span style="color: #FF9500;">*</span>
 									</label>
 									<input asp-for="Price" type="number" class="form-control form-control-lg" style="border: 2px solid #FFE5CC; border-radius: 10px;">
 									<span asp-validation-for="Price" class="text-danger small"></span>
 								</div>
 								<div class="col-md-6">
 									<label asp-for="CategoryId" class="form-label" style="font-weight: 500; color: #2C3E50;">
-										<i class="fas fa-list me-1" style="color: #FF9500;"></i>Danh má»¥c
+										<i class="fas fa-list me-1" style="color: #FF9500;"></i>Danh mục
 									</label>
 									<select asp-for="CategoryId" class="form-select form-select-lg" style="border: 2px solid #FFE5CC; border-radius: 10px;">
-											<option value="">-- Chá»n danh má»¥c --</option>
+											<option value="">-- Chọn danh mục --</option>
 											@foreach (var cat in (ViewBag.Categories as List<ECommerceMVC.Models.MenuCategory>) ?? new List<ECommerceMVC.Models.MenuCategory>())
 											{
 												<option value="@cat.Id" selected="@(cat.Id == Model.CategoryId)">@cat.Name</option>
@@ -60,29 +60,29 @@
 								@if (!string.IsNullOrEmpty(Model.Image))
 								{
 									<div class="mb-3">
-										<label class="form-label" style="font-weight: 500; color: #2C3E50;">áº¢nh hiá»‡n táº¡i:</label><br>
+										<label class="form-label" style="font-weight: 500; color: #2C3E50;">Ảnh hiện tại:</label><br>
 										<img src="~/Hinh/HangHoa/@Model.Image" alt="@Model.Name" style="max-width: 200px; border-radius: 10px;" onerror="this.src='/Hinh/Others/default.jpg'">
 									</div>
 								}
 								<label for="imageFile" class="form-label" style="font-weight: 500; color: #2C3E50;">
-									<i class="fas fa-image me-1" style="color: #FF9500;"></i>Thay Ä‘á»•i áº£nh (Ä‘á»ƒ trá»‘ng náº¿u giá»¯ nguyÃªn)
+									<i class="fas fa-image me-1" style="color: #FF9500;"></i>Thay đổi ảnh (để trống nếu giữ nguyên)
 								</label>
 								<input type="file" name="imageFile" id="imageFile" class="form-control form-control-lg" accept="image/*" style="border: 2px solid #FFE5CC; border-radius: 10px;">
 							</div>
 
-							<div class="mb-4">
-								<div class="form-check">
-									<input asp-for="IsAvailable" class="form-check-input" type="checkbox" style="border-color: #FF9500; width: 20px; height: 20px;">
-									<label asp-for="IsAvailable" class="form-check-label ms-2">CÃ²n hÃ ng</label>
-								</div>
+						<div class="mb-4">
+							<div class="form-check">
+								<input asp-for="IsAvailable" class="form-check-input" type="checkbox" style="border-color: #FF9500; width: 20px; height: 20px;">
+								<label asp-for="IsAvailable" class="form-check-label ms-2">Còn hàng</label>
 							</div>
+						</div>
 
 							<div class="text-center mt-5">
 								<button type="submit" class="btn btn-lg px-5 py-3 me-3" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border: none; border-radius: 50px; color: white; font-weight: 600;">
-									<i class="fas fa-save me-2"></i>Cáº­p nháº­t
+									<i class="fas fa-save me-2"></i>Cập nhật
 								</button>
 								<a asp-action="MenuItems" class="btn btn-lg px-5 py-3" style="background: white; color: #6C757D; border: 2px solid #E0E0E0; border-radius: 50px; font-weight: 600;">
-									<i class="fas fa-times me-2"></i>Há»§y
+									<i class="fas fa-times me-2"></i>Hủy
 								</a>
 							</div>
 						</form>

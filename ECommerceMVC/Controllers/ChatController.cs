@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace ECommerceMVC.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Customer")]
     public class ChatController : Controller
     {
         private readonly FoodOrderingContext db;
@@ -17,139 +17,22 @@ namespace ECommerceMVC.Controllers
             db = context;
         }
 
-        // Customer chat with Admin
+        // Customer chat with Admin (chỉ dành cho Customer)
         public async Task<IActionResult> Index()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            var isAdmin = User.IsInRole("Admin");
+            // Customer chats with Admin
+            var admin = await db.Customers
+                .FirstOrDefaultAsync(c => c.Role == "Admin");
 
-            if (isAdmin)
+            if (admin == null)
             {
-                // Admin sees list of customers who messaged them
-                var customers = await db.ChatMessages
-                    .Where(m => m.ReceiverId == userId || m.SenderId == userId)
-                    .Select(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
-                    .Distinct()
-                    .ToListAsync();
-
-                var customerList = await db.Customers
-                    .Where(c => customers.Contains(c.Id) && c.Role == "Customer")
-                    .OrderByDescending(c => db.ChatMessages
-                        .Where(msg => (msg.SenderId == c.Id && msg.ReceiverId == userId) || 
-                                     (msg.SenderId == userId && msg.ReceiverId == c.Id))
-                        .Max(msg => msg.SentAt))
-                    .ToListAsync();
-
-                return View("AdminChat", customerList);
-            }
-            else
-            {
-                // Customer chats with Admin
-                var admin = await db.Customers
-                    .FirstOrDefaultAsync(c => c.Role == "Admin");
-
-                if (admin == null)
-                {
-                    TempData["Error"] = "Không tìm thấy quản trị viên. Vui lòng thử lại sau.";
-                    return RedirectToAction("Index", "Home");
-                }
-
-                ViewBag.AdminId = admin.Id;
-                ViewBag.AdminName = admin.FullName;
-                return View("CustomerChat");
-            }
-        }
-
-        // Get messages between two users
-        [HttpGet]
-        public async Task<IActionResult> GetMessages(int otherUserId)
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-
-            var messages = await db.ChatMessages
-                .Include(m => m.Sender)
-                .Where(m => (m.SenderId == userId && m.ReceiverId == otherUserId) ||
-                           (m.SenderId == otherUserId && m.ReceiverId == userId))
-                .OrderBy(m => m.SentAt)
-                .Select(m => new
-                {
-                    id = m.Id,
-                    senderId = m.SenderId,
-                    senderName = m.Sender!.FullName,
-                    message = m.Message,
-                    sentAt = m.SentAt.ToString("HH:mm dd/MM/yyyy"),
-                    isRead = m.IsRead
-                })
-                .ToListAsync();
-
-            // Mark messages as read
-            var unreadMessages = await db.ChatMessages
-                .Where(m => m.SenderId == otherUserId && m.ReceiverId == userId && !m.IsRead)
-                .ToListAsync();
-
-            foreach (var msg in unreadMessages)
-            {
-                msg.IsRead = true;
+                TempData["Error"] = "Không tìm thấy quản trị viên. Vui lòng thử lại sau.";
+                return RedirectToAction("Index", "Home");
             }
 
-            if (unreadMessages.Any())
-            {
-                await db.SaveChangesAsync();
-            }
-
-            return Json(messages);
-        }
-
-        // Send a message
-        [HttpPost]
-        public async Task<IActionResult> SendMessage(int receiverId, string message)
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                return Json(new { success = false, message = "Tin nhắn không được để trống" });
-            }
-
-            var chatMessage = new ChatMessage
-            {
-                SenderId = userId,
-                ReceiverId = receiverId,
-                Message = message.Trim(),
-                SentAt = DateTime.UtcNow,
-                IsRead = false
-            };
-
-            db.ChatMessages.Add(chatMessage);
-            await db.SaveChangesAsync();
-
-            var sender = await db.Customers.FindAsync(userId);
-
-            return Json(new
-            {
-                success = true,
-                data = new
-                {
-                    id = chatMessage.Id,
-                    senderId = chatMessage.SenderId,
-                    senderName = sender?.FullName,
-                    message = chatMessage.Message,
-                    sentAt = chatMessage.SentAt.ToString("HH:mm dd/MM/yyyy")
-                }
-            });
-        }
-
-        // Get unread message count
-        [HttpGet]
-        public async Task<IActionResult> GetUnreadCount()
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-
-            var count = await db.ChatMessages
-                .Where(m => m.ReceiverId == userId && !m.IsRead)
-                .CountAsync();
-
-            return Json(new { count });
+            ViewBag.AdminId = admin.Id;
+            ViewBag.AdminName = admin.FullName;
+            return View("CustomerChat");
         }
     }
 }

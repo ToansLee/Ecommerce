@@ -1,14 +1,14 @@
 @model List<ECommerceMVC.Models.Order>
 @{
-    ViewData["Title"] = "Lá»‹ch sá»­ Ä‘Æ¡n hÃ ng";
+    ViewData["Title"] = "Lịch sử đơn hàng";
 }
 
 <!-- Single Page Header start -->
 <div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
-    <h1 class="text-center text-white display-6">Lá»‹ch sá»­ Ä‘Æ¡n hÃ ng</h1>
+    <h1 class="text-center text-white display-6">Lịch sử đơn hàng</h1>
     <ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
-        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500;">Trang chá»§</a></li>
-        <li class="breadcrumb-item active" style="color: white; font-weight: 600;">Lá»‹ch sá»­ Ä‘Æ¡n hÃ ng</li>
+        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500;">Trang chủ</a></li>
+        <li class="breadcrumb-item active" style="color: white; font-weight: 600;">Lịch sử đơn hàng</li>
     </ol>
 </div>
 <!-- Single Page Header End -->
@@ -20,10 +20,10 @@
         {
             <div class="text-center">
                 <i class="fas fa-receipt" style="font-size: 100px; color: #FFE5CC;"></i>
-                <h3 class="mt-4" style="color: #FF9500;">ChÆ°a cÃ³ Ä‘Æ¡n hÃ ng nÃ o</h3>
-                <p class="text-muted">HÃ£y Ä‘áº·t mÃ³n ngay Ä‘á»ƒ thÆ°á»Ÿng thá»©c nhá»¯ng mÃ³n Äƒn ngon!</p>
+                <h3 class="mt-4" style="color: #FF9500;">Chưa có đơn hàng nào</h3>
+                <p class="text-muted">Hãy đặt món ngay để thưởng thức những món ăn ngon!</p>
                 <a asp-action="Index" asp-controller="HangHoa" class="btn btn-lg text-white mt-3" style="background-color: #FF9500; border: none; border-radius: 50px; padding: 12px 40px;">
-                    <i class="fa fa-utensils me-2"></i>Äáº·t mÃ³n ngay
+                    <i class="fa fa-utensils me-2"></i>Đặt món ngay
                 </a>
             </div>
         }
@@ -37,35 +37,35 @@
                             <div class="row align-items-center">
                                 <div class="col-md-2">
                                     <div class="text-center">
-                                        <h5 style="color: #FF9500; margin: 0;">ÄÆ¡n #@order.Id</h5>
+                                        <h5 style="color: #FF9500; margin: 0;">Mã đơn #@order.Id</h5>
                                         <small class="text-muted">@order.CreatedAt.ToString("dd/MM/yyyy")</small>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
-                                    <p class="mb-1"><strong>Tá»•ng tiá»n:</strong></p>
-                                    <p class="mb-0 fw-bold" style="color: #FF9500;">@order.TotalAmount.ToString("N0") VNÄ</p>
+                                    <p class="mb-1"><strong>Tổng tiền:</strong></p>
+                                    <p class="mb-0 fw-bold" style="color: #FF9500;">@order.TotalAmount.ToString("N0") VNĐ</p>
                                 </div>
 
                                 <div class="col-md-2">
-                                    <p class="mb-1"><strong>Tráº¡ng thÃ¡i:</strong></p>
+                                    <p class="mb-1"><strong>Trạng thái:</strong></p>
                                     @{
                                         var statusBadge = order.Status switch
                                         {
                                             "Pending" => "bg-warning",
                                             "Preparing" => "bg-info",
                                             "Delivering" => "bg-primary",
-                                            "Completed" => "bg-success",
+                                            "Delivered" => "bg-success",
                                             "Cancelled" => "bg-danger",
                                             _ => "bg-secondary"
                                         };
                                         var statusText = order.Status switch
                                         {
-                                            "Pending" => "Chá» xÃ¡c nháº­n",
-                                            "Preparing" => "Chuáº©n bá»‹ mÃ³n",
-                                            "Delivering" => "Äang giao",
-                                            "Completed" => "HoÃ n thÃ nh",
-                                            "Cancelled" => "ÄÃ£ há»§y",
+                                            "Pending" => "Chờ xác nhận",
+                                            "Preparing" => "Chuẩn bị món",
+                                            "Delivering" => "Đang giao",
+                                            "Delivered" => "Hoàn thành",
+                                            "Cancelled" => "Đã hủy",
                                             _ => order.Status
                                         };
                                     }
@@ -74,7 +74,7 @@
 
                                 <div class="col-md-3 text-end">
                                     <a asp-action="Details" asp-route-id="@order.Id" class="btn text-white" style="background-color: #FF9500; border: none; border-radius: 25px;">
-                                        <i class="fa fa-eye me-2"></i>Chi tiáº¿t
+                                        <i class="fa fa-eye me-2"></i>Chi tiết
                                     </a>
                                 </div>
                             </div>
@@ -84,15 +84,15 @@
                                 <hr class="my-3">
                                 <div class="row">
                                     <div class="col-12">
-                                        <strong>MÃ³n Äƒn:</strong>
+                                        <strong>Món ăn:</strong>
                                         <ul class="mb-0 mt-2">
                                             @foreach (var item in order.Items.Take(3))
                                             {
-                                                <li>@item.MenuItem?.Name Ã— @item.Quantity</li>
+                                                <li>@item.MenuItem?.Name × @item.Quantity</li>
                                             }
                                             @if (order.Items.Count > 3)
                                             {
-                                                <li class="text-muted">... vÃ  @(order.Items.Count - 3) mÃ³n khÃ¡c</li>
+                                                <li class="text-muted">... và @(order.Items.Count - 3) món khác</li>
                                             }
                                         </ul>
                                     </div>

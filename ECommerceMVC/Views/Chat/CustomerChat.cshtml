@@ -58,7 +58,7 @@
             // Load messages
             function loadMessages() {
                 $.ajax({
-                    url: '@Url.Action("GetMessages", "Chat")',
+                    url: '@Url.Action("GetMessages", "Admin")',
                     type: 'GET',
                     data: { otherUserId: receiverId },
                     success: function(messages) {
@@ -107,7 +107,7 @@
                 if (!message) return;
 
                 $.ajax({
-                    url: '@Url.Action("SendMessage", "Chat")',
+                    url: '@Url.Action("SendMessage", "Admin")',
                     type: 'POST',
                     data: {
                         receiverId: receiverId,

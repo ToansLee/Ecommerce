@@ -1,40 +1,40 @@
 @model ECommerceMVC.Models.Order
 @{
-    ViewData["Title"] = "Chi tiáº¿t Ä‘Æ¡n hÃ ng";
-    Layout = "_LayoutSeller";
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    Layout = "_LayoutAdmin";
     var statusText = Model.Status switch
     {
-        "Pending" => "Chá» xÃ¡c nháº­n",
-        "Preparing" => "Chuáº©n bá»‹ mÃ³n",
-        "Delivering" => "Äang giao",
-        "Completed" => "HoÃ n thÃ nh",
-        "Cancelled" => "ÄÃ£ há»§y",
+        "Pending" => "Chờ xác nhận",
+        "Preparing" => "Chuẩn bị món",
+        "Delivering" => "Đang giao",
+        "Delivered" => "Hoàn thành",
+        "Cancelled" => "Đã hủy",
         _ => Model.Status
     };
 }
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 style="color: #FF9500;"><i class="fas fa-receipt me-2"></i>Chi tiáº¿t Ä‘Æ¡n hÃ ng #@Model.Id</h2>
+        <h2 style="color: #FF9500;"><i class="fas fa-receipt me-2"></i>Chi tiết đơn hàng #@Model.Id</h2>
         <a asp-action="Orders" class="btn text-white" style="background-color: #FF9500; border: none;">
-            <i class="fa fa-arrow-left me-2"></i>Quay láº¡i
+            <i class="fa fa-arrow-left me-2"></i>Quay lại
         </a>
     </div>
 
     <div class="row">
         <div class="col-md-8">
-            <!-- ThÃ´ng tin Ä‘Æ¡n hÃ ng -->
+            <!-- Thông tin đơn hàng -->
             <div class="card mb-4">
                 <div class="card-header" style="background-color: #FFF4E6;">
-                    <h5 class="mb-0" style="color: #FF9500;">ThÃ´ng tin Ä‘Æ¡n hÃ ng</h5>
+                    <h5 class="mb-0" style="color: #FF9500;">Thông tin đơn hàng</h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-6"><strong>MÃ£ Ä‘Æ¡n hÃ ng:</strong></div>
+                        <div class="col-6"><strong>Mã đơn hàng:</strong></div>
                         <div class="col-6">#@Model.Id</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-6"><strong>KhÃ¡ch hÃ ng:</strong></div>
+                        <div class="col-6"><strong>Khách hàng:</strong></div>
                         <div class="col-6">@Model.Customer?.FullName</div>
                     </div>
                     <div class="row mb-3">
@@ -42,41 +42,41 @@
                         <div class="col-6">@Model.Customer?.Email</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-6"><strong>NgÃ y Ä‘áº·t:</strong></div>
+                        <div class="col-6"><strong>Ngày đặt:</strong></div>
                         <div class="col-6">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-6"><strong>Tá»•ng tiá»n:</strong></div>
-                        <div class="col-6 fw-bold" style="color: #FF9500;">@Model.TotalAmount.ToString("N0") VNÄ</div>
+                        <div class="col-6"><strong>Tổng tiền:</strong></div>
+                        <div class="col-6 fw-bold" style="color: #FF9500;">@Model.TotalAmount.ToString("N0")đ</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-6"><strong>PhÆ°Æ¡ng thá»©c thanh toÃ¡n:</strong></div>
+                        <div class="col-6"><strong>Phương thức thanh toán:</strong></div>
                         <div class="col-6">@Model.Payment?.Method</div>
                     </div>
                     @if (!string.IsNullOrEmpty(Model.Notes))
                     {
                         <div class="row">
-                            <div class="col-6"><strong>Ghi chÃº:</strong></div>
+                            <div class="col-6"><strong>Ghi chú:</strong></div>
                             <div class="col-6">@Model.Notes</div>
                         </div>
                     }
                 </div>
             </div>
 
-            <!-- Chi tiáº¿t sáº£n pháº©m -->
+            <!-- Chi tiết sản phẩm -->
             <div class="card">
                 <div class="card-header" style="background-color: #FFF4E6;">
-                    <h5 class="mb-0" style="color: #FF9500;">Chi tiáº¿t sáº£n pháº©m</h5>
+                    <h5 class="mb-0" style="color: #FF9500;">Chi tiết sản phẩm</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>MÃ³n Äƒn</th>
-                                    <th>ÄÆ¡n giÃ¡</th>
-                                    <th>Sá»‘ lÆ°á»£ng</th>
-                                    <th>ThÃ nh tiá»n</th>
+                                    <th>Món ăn</th>
+                                    <th>Đơn giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -89,9 +89,9 @@
                                                 <span>@item.MenuItem?.Name</span>
                                             </div>
                                         </td>
-                                        <td>@item.UnitPrice.ToString("N0") VNÄ</td>
+                                        <td>@item.UnitPrice.ToString("N0")đ</td>
                                         <td>@item.Quantity</td>
-                                        <td><strong>@((item.Quantity * item.UnitPrice).ToString("N0")) VNÄ</strong></td>
+                                        <td><strong>@((item.Quantity * item.UnitPrice).ToString("N0"))đ</strong></td>
                                     </tr>
                                 }
                             </tbody>
@@ -102,14 +102,14 @@
         </div>
 
         <div class="col-md-4">
-            <!-- Cáº­p nháº­t tráº¡ng thÃ¡i -->
+            <!-- Cập nhật trạng thái -->
             <div class="card">
                 <div class="card-header" style="background-color: #FFF4E6;">
-                    <h5 class="mb-0" style="color: #FF9500;">Cáº­p nháº­t tráº¡ng thÃ¡i</h5>
+                    <h5 class="mb-0" style="color: #FF9500;">Cập nhật trạng thái</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label"><strong>Tráº¡ng thÃ¡i hiá»‡n táº¡i:</strong></label>
+                        <label class="form-label"><strong>Trạng thái hiện tại:</strong></label>
                         <div>
                             @{
                                 var statusBadge = Model.Status switch
@@ -117,7 +117,7 @@
                                     "Pending" => "bg-warning",
                                     "Preparing" => "bg-info",
                                     "Delivering" => "bg-primary",
-                                    "Completed" => "bg-success",
+                                    "Delivered" => "bg-success",
                                     "Cancelled" => "bg-danger",
                                     _ => "bg-secondary"
                                 };
@@ -132,25 +132,25 @@
                         @if (Model.Status == "Pending")
                         {
                             <button class="btn text-white" style="background-color: #17a2b8;" onclick="updateStatus(@Model.Id, 'Preparing')">
-                                <i class="fas fa-utensils me-2"></i>XÃ¡c nháº­n & Chuáº©n bá»‹ mÃ³n
+                                <i class="fas fa-utensils me-2"></i>Xác nhận & Chuẩn bị món
                             </button>
                         }
                         @if (Model.Status == "Preparing")
                         {
                             <button class="btn text-white" style="background-color: #007bff;" onclick="updateStatus(@Model.Id, 'Delivering')">
-                                <i class="fas fa-shipping-fast me-2"></i>Báº¯t Ä‘áº§u giao hÃ ng
+                                <i class="fas fa-shipping-fast me-2"></i>Bắt đầu giao hàng
                             </button>
                         }
                         @if (Model.Status == "Delivering")
                         {
-                            <button class="btn btn-success" onclick="updateStatus(@Model.Id, 'Completed')">
-                                <i class="fas fa-check-circle me-2"></i>HoÃ n thÃ nh Ä‘Æ¡n hÃ ng
+                            <button class="btn btn-success" onclick="updateStatus(@Model.Id, 'Delivered')">
+                                <i class="fas fa-check-circle me-2"></i>Hoàn thành đơn hàng
                             </button>
                         }
-                        @if (Model.Status != "Completed" && Model.Status != "Cancelled")
+                        @if (Model.Status != "Delivered" && Model.Status != "Cancelled")
                         {
                             <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 'Cancelled')">
-                                <i class="fas fa-times-circle me-2"></i>Há»§y Ä‘Æ¡n hÃ ng
+                                <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
                             </button>
                         }
                     </div>
@@ -164,15 +164,15 @@
     <script>
         function updateStatus(orderId, status) {
             var statusText = {
-                'Preparing': 'Chuáº©n bá»‹ mÃ³n',
-                'Delivering': 'Äang giao',
-                'Completed': 'HoÃ n thÃ nh',
-                'Cancelled': 'Há»§y Ä‘Æ¡n'
+                'Preparing': 'Chuẩn bị món',
+                'Delivering': 'Đang giao',
+                'Delivered': 'Hoàn thành',
+                'Cancelled': 'Hủy đơn'
             };
 
             if (confirm('Bạn có chắc muốn cập nhật trạng thái thành "' + statusText[status] + '"?')) {
                 $.ajax({
-                    url: '@Url.Action("UpdateOrderStatus", "Seller")',
+                    url: '@Url.Action("UpdateOrderStatus", "Admin")',
                     type: 'POST',
                     data: { id: orderId, status: status },
                     success: function(response) {
@@ -184,7 +184,7 @@
                         }
                     },
                     error: function() {
-                        alert('CÃ³ lá»—i xáº£y ra khi cáº­p nháº­t tráº¡ng thÃ¡i!');
+                        alert('Có lỗi xảy ra khi cập nhật trạng thái!');
                     }
                 });
             }

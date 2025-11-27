@@ -102,7 +102,7 @@ html {
 
 .navbar-custom-link:hover {
   color: #FF9500 !important;
-  background-color: #FFF4E6;
+  background-color: #FFF4E6 !important;
   transform: translateY(-2px);
 }
 
@@ -110,13 +110,15 @@ html {
   width: 80%;
 }
 
+.navbar .navbar-nav .navbar-custom-link.active,
 .navbar-custom-link.active {
   color: white !important;
-  background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%);
-  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+  background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%) !important;
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3) !important;
   transform: translateY(-2px);
 }
 
+.navbar .navbar-nav .navbar-custom-link.active::after,
 .navbar-custom-link.active::after {
   width: 0;
 }

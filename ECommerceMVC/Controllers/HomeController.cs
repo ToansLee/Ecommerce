@@ -18,13 +18,11 @@ namespace ECommerceMVC.Controllers
 
 		public IActionResult Index()
 		{
-			// Seller không được truy cập trang Home - chỉ dành cho Customer mua hàng
-			if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
-			{
-				return RedirectToAction("Index", "Seller");
-			}
-
-			// Lấy tất cả sản phẩm để hỗ trợ filter theo category
+		// Admin không được truy cập trang Home - chỉ dành cho Customer mua hàng
+		if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+		{
+			return RedirectToAction("Index", "Admin");
+		}			// Lấy tất cả sản phẩm để hỗ trợ filter theo category
 			var menuItems = _db.MenuItems
 				.Include(m => m.Category)
 				.OrderByDescending(m => m.CreatedAt)

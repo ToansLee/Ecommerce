@@ -1,7 +1,7 @@
 @model List<ECommerceMVC.Models.Customer>
 @{
     ViewData["Title"] = "Quản lý tin nhắn";
-    Layout = "_LayoutSeller";
+    Layout = "_LayoutAdmin";
 }
 
 <div class="container-fluid py-4">
@@ -113,7 +113,7 @@
                 if (!currentCustomerId) return;
 
                 $.ajax({
-                    url: '@Url.Action("GetMessages", "Chat")',
+                    url: '@Url.Action("GetMessages", "Admin")',
                     type: 'GET',
                     data: { otherUserId: currentCustomerId },
                     success: function(messages) {
@@ -159,7 +159,7 @@
                 if (!message) return;
 
                 $.ajax({
-                    url: '@Url.Action("SendMessage", "Chat")',
+                    url: '@Url.Action("SendMessage", "Admin")',
                     type: 'POST',
                     data: {
                         receiverId: currentCustomerId,

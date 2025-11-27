@@ -1,7 +1,7 @@
 @model ECommerceMVC.ViewModels.EditProfileVM
 @{
-    ViewData["Title"] = "Chá»‰nh sá»­a thÃ´ng tin";
-    Layout = User.IsInRole("Admin") ? "_LayoutSeller" : "_LayoutCustomer";
+    ViewData["Title"] = "Chỉnh sửa thông tin";
+    Layout = User.IsInRole("Admin") ? "_LayoutAdmin" : "_LayoutCustomer";
 }
 
 <style>
@@ -134,7 +134,7 @@
 <div class="page-header-edit">
     <div class="container">
         <div class="text-center">
-            <h1 class="display-4 text-white mb-3">Chá»‰nh sá»­a thÃ´ng tin</h1>
+            <h1 class="display-4 text-white mb-3">Chỉnh sửa thông tin</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-center mb-0" style="background: transparent;">
                     @if (User.IsInRole("Admin"))
@@ -143,10 +143,10 @@
                     }
                     else
                     {
-                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Trang chá»§</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Trang chủ</a></li>
                     }
-                    <li class="breadcrumb-item"><a asp-controller="KhachHang" asp-action="Profile" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">ThÃ´ng tin tÃ i khoáº£n</a></li>
-                    <li class="breadcrumb-item text-white" aria-current="page" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Chá»‰nh sá»­a</li>
+                    <li class="breadcrumb-item"><a asp-controller="KhachHang" asp-action="Profile" class="text-white" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Thông tin tài khoản</a></li>
+                    <li class="breadcrumb-item text-white" aria-current="page" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Chỉnh sửa</li>
                 </ol>
             </nav>
         </div>
@@ -155,8 +155,8 @@
 
 <div class="edit-profile-container">
     <div class="form-header">
-        <h2><i class="fas fa-user-edit"></i> Cáº­p nháº­t thÃ´ng tin</h2>
-        <p>Vui lÃ²ng Ä‘iá»n thÃ´ng tin chÃ­nh xÃ¡c</p>
+        <h2><i class="fas fa-user-edit"></i> Cập nhật thông tin</h2>
+        <p>Vui lòng điền thông tin chính xác</p>
     </div>
 
     @if (!ViewData.ModelState.IsValid && ViewData.ModelState[""]?.Errors.Count > 0)
@@ -171,9 +171,9 @@
         <div class="form-group">
             <label asp-for="FullName" class="form-label">
                 <i class="fas fa-user"></i>
-                <span>Há» tÃªn</span>
+                <span>Họ tên</span>
             </label>
-            <input asp-for="FullName" class="form-control" placeholder="Nháº­p há» tÃªn Ä‘áº§y Ä‘á»§" />
+            <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên đầy đủ" />
             <span asp-validation-for="FullName" class="text-danger"></span>
         </div>
 
@@ -189,20 +189,56 @@
         <div class="form-group">
             <label asp-for="Phone" class="form-label">
                 <i class="fas fa-phone"></i>
-                <span>Sá»‘ Ä‘iá»‡n thoáº¡i</span>
+                <span>Số điện thoại</span>
             </label>
             <input asp-for="Phone" class="form-control" placeholder="0123456789" />
             <span asp-validation-for="Phone" class="text-danger"></span>
         </div>
 
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-venus-mars"></i>
+                <span>Giới tính</span>
+            </label>
+            <div style="display: flex; gap: 30px; padding: 10px 0;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" asp-for="Gender" value="true" style="width: 18px; height: 18px;" />
+                    <span>Nam</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" asp-for="Gender" value="false" style="width: 18px; height: 18px;" />
+                    <span>Nữ</span>
+                </label>
+            </div>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DateOfBirth" class="form-label">
+                <i class="fas fa-calendar"></i>
+                <span>Ngày sinh</span>
+            </label>
+            <input asp-for="DateOfBirth" class="form-control" type="date" />
+            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address" class="form-label">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Địa chỉ</span>
+            </label>
+            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ đầy đủ"></textarea>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
         <button type="submit" class="btn-submit">
             <i class="fas fa-save"></i>
-            <span>LÆ°u thay Ä‘á»•i</span>
+            <span>Lưu thay đổi</span>
         </button>
 
         <a asp-action="Profile" class="btn-cancel">
             <i class="fas fa-times"></i>
-            <span>Há»§y bá»</span>
+            <span>Hủy bỏ</span>
         </a>
     </form>
 </div>

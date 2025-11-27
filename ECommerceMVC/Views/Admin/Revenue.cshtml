@@ -1,0 +1,436 @@
+@{
+    ViewData["Title"] = "Quản lý doanh thu";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 style="color: #FF9500; font-weight: 600; margin: 0;">
+                <i class="fas fa-chart-line me-2"></i>Thống kê doanh thu
+            </h2>
+            <p class="text-muted mb-0">Tổng quan và phân tích doanh thu</p>
+        </div>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid #FF9500 !important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Doanh thu hôm nay</p>
+                            <h3 class="mb-0" style="color: #FF9500;">@ViewBag.TodayRevenue.ToString("N0")đ</h3>
+                            <small class="text-muted">@ViewBag.TodayOrders đơn hàng</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar-day" style="font-size: 2.5rem; color: #FF9500; opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid #28a745 !important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Doanh thu tháng này</p>
+                            <h3 class="mb-0" style="color: #28a745;">@ViewBag.MonthRevenue.ToString("N0")đ</h3>
+                            <small class="text-muted">Tháng @DateTime.Now.Month</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar-alt" style="font-size: 2.5rem; color: #28a745; opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid #17a2b8 !important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Doanh thu năm nay</p>
+                            <h3 class="mb-0" style="color: #17a2b8;">@ViewBag.YearRevenue.ToString("N0")đ</h3>
+                            <small class="text-muted">Năm @DateTime.Now.Year</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar" style="font-size: 2.5rem; color: #17a2b8; opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100" style="border-left: 4px solid #ffc107 !important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Tổng doanh thu</p>
+                            <h3 class="mb-0" style="color: #ffc107;">@ViewBag.TotalRevenue.ToString("N0")đ</h3>
+                            <small class="text-muted">@ViewBag.TotalOrders đơn hàng</small>
+                        </div>
+                        <div>
+                            <i class="fas fa-dollar-sign" style="font-size: 2.5rem; color: #ffc107; opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Kỳ thống kê</label>
+                            <select id="periodSelect" class="form-select">
+                                <option value="month" selected="@(ViewBag.SelectedPeriod == "month")">Theo tháng</option>
+                                <option value="year" selected="@(ViewBag.SelectedPeriod == "year")">Theo năm</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Năm</label>
+                            <select id="yearSelect" class="form-select">
+                                @for (int i = DateTime.Now.Year; i >= DateTime.Now.Year - 5; i--)
+                                {
+                                    <option value="@i" selected="@(ViewBag.SelectedYear == i)">@i</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2" id="monthFilter">
+                            <label class="form-label">Tháng</label>
+                            <select id="monthSelect" class="form-select">
+                                @for (int i = 1; i <= 12; i++)
+                                {
+                                    <option value="@i" selected="@(ViewBag.SelectedMonth == i)">Tháng @i</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button onclick="loadRevenueChart()" class="btn btn-primary w-100">
+                                <i class="fas fa-sync-alt me-1"></i>Cập nhật
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ doanh thu -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0" style="color: #FF9500;">
+                        <i class="fas fa-chart-bar me-2"></i>Biểu đồ doanh thu
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" style="height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Sản phẩm bán chạy -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0" style="color: #FF9500;">
+                        <i class="fas fa-fire me-2"></i>Sản phẩm bán chạy
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="topProductsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end">Doanh thu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data loaded by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khách hàng VIP -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0" style="color: #FF9500;">
+                        <i class="fas fa-crown me-2"></i>Khách hàng VIP
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="topCustomersTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên khách hàng</th>
+                                    <th class="text-center">Đơn hàng</th>
+                                    <th class="text-end">Tổng chi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data loaded by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doanh thu theo danh mục -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0" style="color: #FF9500;">
+                        <i class="fas fa-chart-pie me-2"></i>Doanh thu theo danh mục
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let revenueChart = null;
+        let categoryChart = null;
+
+        $(document).ready(function() {
+            loadRevenueChart();
+            loadTopProducts();
+            loadTopCustomers();
+            loadCategoryChart();
+
+            // Xử lý thay đổi kỳ thống kê
+            $('#periodSelect').change(function() {
+                if ($(this).val() === 'year') {
+                    $('#monthFilter').hide();
+                } else {
+                    $('#monthFilter').show();
+                }
+            });
+
+            // Khởi tạo hiển thị
+            if ($('#periodSelect').val() === 'year') {
+                $('#monthFilter').hide();
+            }
+        });
+
+        function loadRevenueChart() {
+            const period = $('#periodSelect').val();
+            const year = $('#yearSelect').val();
+            const month = $('#monthSelect').val();
+
+            let url = period === 'month' 
+                ? `@Url.Action("GetRevenueByMonth", "Admin")?year=${year}&month=${month}`
+                : `@Url.Action("GetRevenueByYear", "Admin")?year=${year}`;
+
+            $.get(url, function(data) {
+                const labels = period === 'month' 
+                    ? data.map(d => `Ngày ${d.day}`)
+                    : data.map(d => `Tháng ${d.month}`);
+                
+                const revenues = data.map(d => d.revenue);
+                const orders = data.map(d => d.orderCount);
+
+                if (revenueChart) {
+                    revenueChart.destroy();
+                }
+
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Doanh thu (đ)',
+                            data: revenues,
+                            backgroundColor: 'rgba(255, 149, 0, 0.6)',
+                            borderColor: '#FF9500',
+                            borderWidth: 2,
+                            yAxisID: 'y'
+                        }, {
+                            label: 'Số đơn hàng',
+                            data: orders,
+                            type: 'line',
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 2,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString('vi-VN') + 'đ';
+                                    }
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.datasetIndex === 0) {
+                                            label += context.parsed.y.toLocaleString('vi-VN') + 'đ';
+                                        } else {
+                                            label += context.parsed.y + ' đơn';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        function loadTopProducts() {
+            $.get('@Url.Action("GetTopSellingProducts", "Admin")', function(data) {
+                const tbody = $('#topProductsTable tbody');
+                tbody.empty();
+                
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">Chưa có dữ liệu</td></tr>');
+                    return;
+                }
+
+                data.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${item.productName}</strong></td>
+                            <td class="text-center"><span class="badge bg-primary">${item.totalQuantity}</span></td>
+                            <td class="text-end"><strong style="color: #FF9500;">${item.totalRevenue.toLocaleString('vi-VN')}đ</strong></td>
+                        </tr>
+                    `);
+                });
+            });
+        }
+
+        function loadTopCustomers() {
+            $.get('@Url.Action("GetTopCustomers", "Admin")', function(data) {
+                const tbody = $('#topCustomersTable tbody');
+                tbody.empty();
+                
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">Chưa có dữ liệu</td></tr>');
+                    return;
+                }
+
+                data.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>
+                                <strong>${item.customerName}</strong><br>
+                                <small class="text-muted">${item.email}</small>
+                            </td>
+                            <td class="text-center"><span class="badge bg-info">${item.totalOrders}</span></td>
+                            <td class="text-end"><strong style="color: #28a745;">${item.totalSpent.toLocaleString('vi-VN')}đ</strong></td>
+                        </tr>
+                    `);
+                });
+            });
+        }
+
+        function loadCategoryChart() {
+            $.get('@Url.Action("GetRevenueByCategory", "Admin")', function(data) {
+                if (categoryChart) {
+                    categoryChart.destroy();
+                }
+
+                const labels = data.map(d => d.category);
+                const revenues = data.map(d => d.revenue);
+                const colors = [
+                    '#FF9500', '#28a745', '#17a2b8', '#ffc107', '#dc3545',
+                    '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#6610f2'
+                ];
+
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                categoryChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: revenues,
+                            backgroundColor: colors.slice(0, data.length),
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${label}: ${value.toLocaleString('vi-VN')}đ (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+}
