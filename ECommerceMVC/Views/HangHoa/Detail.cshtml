@@ -83,14 +83,14 @@
 													<img src="~/Hinh/HangHoa/@product.Hinh" class="w-100 h-100 rounded-top" style="object-fit: cover;" alt="@product.TenHH">
 												</a>
 											</div>
-											<div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">@product.TenLoai</div>
+											<div class="text-white bg-warning px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">@product.TenLoai</div>
 											<div class="p-4 border border-secondary border-top-0 rounded-bottom flex-grow-1 d-flex flex-column">
 												<h4 style="height: 48px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><a asp-action="Detail" asp-route-id="@product.MaHh" style="text-decoration: none; color: inherit;">@product.TenHH</a></h4>
 												<p style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">@product.MoTaNgan</p>
 												<div class="d-flex justify-content-between flex-lg-wrap mt-auto">
-													<p class="text-dark fs-5 fw-bold mb-0">@product.DonGia.ToString("N0") VN�</p>
+													<p class="text-dark fs-5 fw-bold mb-0">@product.DonGia.ToString("N0") VNĐ</p>
 													<a href="#" class="btn border border-secondary rounded-pill px-3 text-primary add-to-cart-related" data-product-id="@product.MaHh">
-														<i class="fa fa-shopping-bag me-2 text-primary"></i> �ua v�o gi?
+														<i class="fa fa-shopping-bag me-2 text-primary"></i> Đưa vào giỏ
 													</a>
 												</div>
 											</div>
@@ -120,14 +120,18 @@
 @section Scripts {
 	<script>
 		$(document).ready(function() {
-			// Handle quantity buttons
-			$('.btn-plus').click(function () {
+			// Handle quantity buttons - Remove all previous handlers first
+			$('.btn-plus').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
 				var input = $(this).closest('.quantity').find('input');
 				var value = parseInt(input.val()) || 1;
 				input.val(value + 1);
 			});
 
-			$('.btn-minus').click(function () {
+			$('.btn-minus').off('click').on('click', function (e) {
+				e.preventDefault();
+				e.stopPropagation();
 				var input = $(this).closest('.quantity').find('input');
 				var value = parseInt(input.val()) || 1;
 				if (value > 1) {
@@ -187,7 +191,7 @@
 					error: function() {
 						// Show error notification
 						var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
-							'<i class="fa fa-exclamation-circle me-2"></i>C� l?i x?y ra khi th�m v�o gi? h�ng!' +
+							'<i class="fa fa-exclamation-circle me-2"></i>Có lỗi xảy ra khi thêm vào giỏ hàng!' +
 							'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
 							'</div>');
 						$('body').append(errorMessage);
@@ -252,7 +256,7 @@
 					error: function () {
 						// Show error notification
 						var errorMessage = $('<div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">' +
-							'<i class="fa fa-exclamation-circle me-2"></i>C� l?i x?y ra khi th�m v�o gi? h�ng!' +
+							'<i class="fa fa-exclamation-circle me-2"></i>Có lỗi xảy ra khi thêm vào giỏ hàng!' +
 							'<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
 							'</div>');
 						$('body').append(errorMessage);

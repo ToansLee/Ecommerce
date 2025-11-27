@@ -8,14 +8,12 @@ namespace ECommerceMVC.Data
         public FoodOrderingContext(DbContextOptions<FoodOrderingContext> options) : base(options) { }
 
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<MenuCategory> MenuCategories { get; set; }
         public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<Revenue> Revenues { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
@@ -29,14 +27,6 @@ namespace ECommerceMVC.Data
                 eb.Property(e => e.Email).HasMaxLength(100).IsRequired();
                 eb.Property(e => e.FullName).HasMaxLength(100).IsRequired();
                 eb.Property(e => e.Role).HasMaxLength(20).IsRequired();
-            });
-
-            // Restaurant
-            modelBuilder.Entity<Restaurant>(eb =>
-            {
-                eb.HasKey(e => e.Id);
-                eb.Property(e => e.Name).HasMaxLength(150).IsRequired();
-                eb.HasOne(r => r.Seller).WithOne(c => c.Restaurant).HasForeignKey<Restaurant>(r => r.SellerId);
             });
 
             // MenuCategory
@@ -77,14 +67,6 @@ namespace ECommerceMVC.Data
                 eb.HasKey(e => e.Id);
                 eb.Property(e => e.Line).HasMaxLength(200).IsRequired();
                 eb.HasOne(a => a.Customer).WithMany(c => c.Addresses).HasForeignKey(a => a.CustomerId).OnDelete(DeleteBehavior.Cascade);
-            });
-
-            // Revenue
-            modelBuilder.Entity<Revenue>(eb =>
-            {
-                eb.HasKey(e => e.Id);
-                eb.HasOne(r => r.Seller).WithMany(c => c.Revenues).HasForeignKey(r => r.SellerId).OnDelete(DeleteBehavior.Restrict);
-                eb.HasOne(r => r.Order).WithMany().HasForeignKey(r => r.OrderId).OnDelete(DeleteBehavior.Restrict);
             });
 
             // ChatMessage

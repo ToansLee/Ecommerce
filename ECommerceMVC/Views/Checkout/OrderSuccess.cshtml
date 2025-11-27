@@ -1,76 +1,86 @@
 @model ECommerceMVC.Models.Order
 @{
-    ViewData["Title"] = "Äáº·t hÃ ng thÃ nh cÃ´ng";
+    ViewData["Title"] = "Đặt hàng thành công";
 }
 
 <!-- Single Page Header start -->
-<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
-    <h1 class="text-center text-white display-6">Äáº·t hÃ ng thÃ nh cÃ´ng</h1>
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(40, 167, 69, 0.9) 0%, rgba(72, 187, 120, 0.9) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+    <h1 class="text-center text-white display-4 fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"><i class="fa fa-check-circle me-3"></i>Đặt hàng thành công</h1>
 </div>
 <!-- Single Page Header End -->
 
 <!-- Order Success Start -->
-<div class="container-fluid py-5">
+<div class="container-fluid py-5" style="background-color: #f8f9fa;">
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="text-center mb-5">
+                <div class="text-center mb-5 p-5 shadow-lg" style="background: linear-gradient(135deg, #FFFFFF 0%, #E8F5E9 100%); border-radius: 20px; border: 3px solid #28a745;">
                     <div class="mb-4">
-                        <i class="fas fa-check-circle" style="font-size: 100px; color: #28a745;"></i>
+                        <i class="fas fa-check-circle" style="font-size: 120px; color: #28a745;"></i>
                     </div>
-                    <h2 class="mb-3" style="color: #FF9500;">Äáº·t hÃ ng thÃ nh cÃ´ng!</h2>
-                    <p class="text-muted">Cáº£m Æ¡n báº¡n Ä‘Ã£ Ä‘áº·t hÃ ng. ÄÆ¡n hÃ ng cá»§a báº¡n Ä‘ang Ä‘Æ°á»£c xá»­ lÃ½.</p>
+                    <h2 class="mb-3 fw-bold" style="color: #28a745;">Đặt hàng thành công!</h2>
+                    <p class="lead" style="color: #2C3E50;">Cảm ơn bạn đã đặt hàng. Đơn hàng của bạn đang được xử lý.</p>
+                    <hr style="border-top: 2px dashed #28a745; width: 50%; margin: 20px auto;">
+                    <p class="text-muted"><i class="fa fa-info-circle me-2"></i>Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất</p>
                 </div>
 
-                <div class="rounded p-4 mb-4" style="background-color: #FFF4E6;">
-                    <h4 class="mb-3" style="color: #FF9500;">ThÃ´ng tin Ä‘Æ¡n hÃ ng</h4>
-                    <div class="row mb-2">
-                        <div class="col-6"><strong>MÃ£ Ä‘Æ¡n hÃ ng:</strong></div>
-                        <div class="col-6">#@Model.Id</div>
+                <div class="shadow-lg mb-4" style="background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F0 100%); border-radius: 20px; border: 2px solid #FF9500;">
+                    <div class="p-4" style="background: linear-gradient(135deg, #FF9500 0%, #FFB84D 100%); border-radius: 18px 18px 0 0;">
+                        <h3 class="mb-0 text-white fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);"><i class="fa fa-file-invoice me-2"></i>Thông tin đơn hàng</h3>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-6"><strong>NgÃ y Ä‘áº·t:</strong></div>
-                        <div class="col-6">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-6"><strong>Tá»•ng tiá»n:</strong></div>
-                        <div class="col-6 fw-bold" style="color: #FF9500;">@Model.TotalAmount.ToString("N0") VNÄ</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-6"><strong>PhÆ°Æ¡ng thá»©c thanh toÃ¡n:</strong></div>
-                        <div class="col-6">Thanh toÃ¡n khi nháº­n hÃ ng (COD)</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6"><strong>Tráº¡ng thÃ¡i thanh toÃ¡n:</strong></div>
-                        <div class="col-6">
-                            <span class="badge bg-warning">Thanh toÃ¡n khi nháº­n hÃ ng</span>
+                    <div class="p-4">
+                        <div class="row mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+                            <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-hashtag me-2 text-warning"></i>Mã đơn hàng:</strong></div>
+                            <div class="col-6 fw-bold" style="color: #FF9500; font-size: 1.1rem;">#@Model.Id</div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="rounded p-4 mb-4" style="background-color: #FFF4E6;">
-                    <h4 class="mb-3" style="color: #FF9500;">Chi tiáº¿t sáº£n pháº©m</h4>
-                    @foreach (var item in Model.Items)
-                    {
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-                            <div class="d-flex align-items-center">
-                                <img src="~/Hinh/HangHoa/@item.MenuItem?.Image" class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;" alt="@item.MenuItem?.Name">
-                                <div class="ms-3">
-                                    <h6 class="mb-1">@item.MenuItem?.Name</h6>
-                                    <small class="text-muted">Sá»‘ lÆ°á»£ng: @item.Quantity Ã— @item.UnitPrice.ToString("N0") VNÄ</small>
-                                </div>
+                        <div class="row mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+                            <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-calendar me-2 text-info"></i>Ngày đặt:</strong></div>
+                            <div class="col-6 fw-semibold">@Model.CreatedAt.AddHours(7).ToString("dd/MM/yyyy HH:mm") (GMT+7)</div>
+                        </div>
+                        <div class="row mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+                            <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-money-bill-wave me-2 text-success"></i>Tổng tiền:</strong></div>
+                            <div class="col-6 fw-bold" style="color: #27AE60; font-size: 1.3rem;">@Model.TotalAmount.ToString("N0") VNĐ</div>
+                        </div>
+                        <div class="row mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+                            <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-credit-card me-2 text-primary"></i>Phương thức thanh toán:</strong></div>
+                            <div class="col-6 fw-semibold">Thanh toán khi nhận hàng (COD)</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-check-circle me-2 text-warning"></i>Trạng thái thanh toán:</strong></div>
+                            <div class="col-6">
+                                <span class="badge" style="background-color: #FFA726; font-size: 0.9rem; padding: 8px 15px;">Thanh toán khi nhận hàng</span>
                             </div>
-                            <p class="mb-0 fw-bold">@((item.Quantity * item.UnitPrice).ToString("N0")) VNÄ</p>
                         </div>
-                    }
+                    </div>
+                </div>
+
+                <div class="shadow-lg mb-4" style="background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F0 100%); border-radius: 20px; border: 2px solid #FF9500;">
+                    <div class="p-4" style="background: linear-gradient(135deg, #FF9500 0%, #FFB84D 100%); border-radius: 18px 18px 0 0;">
+                        <h3 class="mb-0 text-white fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);"><i class="fa fa-shopping-bag me-2"></i>Chi tiết sản phẩm</h3>
+                    </div>
+                    <div class="p-4">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/Hinh/HangHoa/@item.MenuItem?.Image" class="img-fluid rounded shadow-sm" style="width: 90px; height: 90px; object-fit: cover; border: 2px solid #FF9500;" alt="@item.MenuItem?.Name">
+                                    <div class="ms-3">
+                                        <h6 class="mb-1 fw-bold" style="color: #2C3E50;">@item.MenuItem?.Name</h6>
+                                        <small class="text-muted"><i class="fa fa-shopping-cart me-1"></i>Số lượng: <strong>@item.Quantity</strong> × <strong>@item.UnitPrice.ToString("N0") VNĐ</strong></small>
+                                    </div>
+                                </div>
+                                <p class="mb-0 fw-bold" style="color: #27AE60; font-size: 1.2rem;">@((item.Quantity * item.UnitPrice).ToString("N0")) VNĐ</p>
+                            </div>
+                        }
+                    </div>
                 </div>
 
                 <div class="text-center mt-5">
-                    <a asp-action="Index" asp-controller="Home" class="btn btn-lg text-white me-3" style="background-color: #FF9500; border: none; border-radius: 50px; padding: 12px 40px;">
-                        <i class="fa fa-home me-2"></i>Vá» trang chá»§
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-lg text-white me-3 shadow" style="background: linear-gradient(135deg, #FF9500 0%, #FFB84D 100%); border: none; border-radius: 15px; padding: 15px 45px; font-weight: 700; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <i class="fa fa-home me-2"></i>Về trang chủ
                     </a>
-                    <a asp-action="Index" asp-controller="HangHoa" class="btn btn-lg btn-outline-secondary" style="border-radius: 50px; padding: 12px 40px;">
-                        <i class="fa fa-utensils me-2"></i>Tiáº¿p tá»¥c Ä‘áº·t mÃ³n
+                    <a asp-action="Index" asp-controller="HangHoa" class="btn btn-lg btn-outline-secondary shadow" style="border-radius: 15px; padding: 15px 45px; border: 2px solid #95A5A6; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.backgroundColor='#95A5A6'; this.style.color='white'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6C757D'">
+                        <i class="fa fa-utensils me-2"></i>Tiếp tục đặt món
                     </a>
                 </div>
             </div>

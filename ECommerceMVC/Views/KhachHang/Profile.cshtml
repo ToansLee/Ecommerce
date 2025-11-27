@@ -297,36 +297,6 @@
                 </div>
             </div>
 
-            <!-- ThÃ´ng tin nhÃ  hÃ ng (chá»‰ hiá»ƒn thá»‹ cho Seller) -->
-            @if (Model.Role == "Seller" && Model.Restaurant != null)
-            {
-                <div class="profile-section">
-                    <div class="profile-section-title">
-                        <i class="fas fa-store" style="font-size: 22px;"></i>
-                        <span>ThÃ´ng tin nhÃ  hÃ ng</span>
-                    </div>
-                    <div class="restaurant-info">
-                        <div class="restaurant-name">
-                            <i class="fas fa-utensils"></i>
-                            <span>@Model.Restaurant.Name</span>
-                        </div>
-                        @if (!string.IsNullOrEmpty(Model.Restaurant.Address))
-                        {
-                            <div style="color: #666; margin-top: 5px;">
-                                <i class="fas fa-map-marker-alt"></i> @Model.Restaurant.Address
-                            </div>
-                        }
-                        @if (!string.IsNullOrEmpty(Model.Restaurant.Phone))
-                        {
-                            <div style="color: #666; margin-top: 5px;">
-                                <i class="fas fa-phone"></i> @Model.Restaurant.Phone
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-
-            <!-- Action Buttons -->
             <div class="action-buttons">
                 <a asp-action="EditProfile" class="btn btn-custom btn-edit">
                     <i class="fas fa-edit"></i>

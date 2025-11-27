@@ -1,117 +1,130 @@
 @model IEnumerable<ECommerceMVC.ViewModels.CartItem>
 @{
-	ViewData["Title"] = "Gi? h�ng";
+	ViewData["Title"] = "Giỏ hàng";
 }
 
 <!-- Single Page Header start -->
-<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
-	<h1 class="text-center text-white display-6">Gi? h�ng</h1>
-	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.15); padding: 12px 24px; border-radius: 50px;">
+<div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.9) 0%, rgba(245, 169, 96, 0.9) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
+	<h1 class="text-center text-white display-4 fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"><i class="fa fa-shopping-cart me-3"></i>Giỏ hàng của bạn</h1>
+	<ol class="breadcrumb justify-content-center mb-0" style="background-color: rgba(255, 255, 255, 0.2); padding: 12px 24px; border-radius: 50px; backdrop-filter: blur(10px);">
 		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Trang chủ</a></li>
 		<li class="breadcrumb-item"><a asp-action="Index" asp-controller="HangHoa" style="color: white; text-decoration: none; font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); transition: all 0.3s;" onmouseover="this.style.color='#FFF4E6'" onmouseout="this.style.color='white'">Thực đơn</a></li>
-		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Gi? h�ng</li>
+		<li class="breadcrumb-item active" style="color: white; font-weight: 600; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">Giỏ hàng</li>
 	</ol>
 </div>
 <!-- Single Page Header End -->
 <!-- Cart Page Start -->
-<div class="container-fluid py-5">
+<div class="container-fluid py-5" style="background-color: #f8f9fa;">
 	<div class="container py-5">
-		<div class="table-responsive">
-			<table class="table">
-				<thead>
+		<div class="table-responsive shadow-sm" style="background: white; border-radius: 15px; overflow: hidden;">
+			<table class="table mb-0">
+				<thead style="background: linear-gradient(135deg, #FF9500 0%, #FFB84D 100%);">
 					<tr>
-						<th scope="col">H�nh ?nh</th>
-						<th scope="col">T�n s?n ph?m</th>
-						<th scope="col">�on gi�</th>
-						<th scope="col">S? lu?ng</th>
-						<th scope="col">Th�nh ti?n</th>
-						<th scope="col">Thao t�c</th>
+						<th scope="col" class="text-white fw-bold py-3 ps-4">Hình ảnh</th>
+						<th scope="col" class="text-white fw-bold py-3">Tên sản phẩm</th>
+						<th scope="col" class="text-white fw-bold py-3">Đơn giá</th>
+						<th scope="col" class="text-white fw-bold py-3">Số lượng</th>
+						<th scope="col" class="text-white fw-bold py-3">Thành tiền</th>
+						<th scope="col" class="text-white fw-bold py-3 pe-4">Thao tác</th>
 					</tr>
 				</thead>
 				<tbody>
 					@foreach (var item in Model)
 					{
-						<tr>
-							<th scope="row">
+						<tr style="border-bottom: 1px solid #dee2e6;">
+							<td class="align-middle ps-4">
 								<div class="d-flex align-items-center">
-									<img src="~/Hinh/HangHoa/@item.Hinh" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="@item.TenHH">
+									<img src="~/Hinh/HangHoa/@item.Hinh" class="img-fluid rounded shadow-sm" style="width: 90px; height: 90px; object-fit: cover; border: 2px solid #FF9500;" alt="@item.TenHH">
 								</div>
-							</th>
-							<td>
-								<p class="mb-0 mt-4">
-									<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
+							</td>
+							<td class="align-middle">
+								<p class="mb-0 fw-semibold" style="color: #2C3E50; font-size: 1.05rem;">
+									<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh" style="text-decoration: none; color: inherit; transition: color 0.3s;" onmouseover="this.style.color='#FF9500'" onmouseout="this.style.color='#2C3E50'">
 										@item.TenHH
 									</a>
 								</p>
 							</td>
-							<td>
-								<p class="mb-0 mt-4">@item.DonGia.ToString("N0") VN�</p>
+							<td class="align-middle">
+								<p class="mb-0 fw-bold" style="color: #FF9500; font-size: 1.1rem;">@item.DonGia.ToString("N0") VNĐ</p>
 							</td>
-						<td>
-							<div class="input-group quantity mt-4" style="width: 100px;" data-product-id="@item.MaHh" data-price="@item.DonGia">
-								<div class="input-group-btn">
-									<button class="btn btn-sm cart-btn-minus rounded-circle bg-light border" type="button">
+							<td class="align-middle">
+								<div class="input-group quantity" style="width: 130px;" data-product-id="@item.MaHh" data-price="@item.DonGia">
+									<button class="btn cart-btn-minus" type="button" style="background: linear-gradient(135deg, #FF9500, #FFB84D); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
 										<i class="fa fa-minus"></i>
 									</button>
-								</div>
-								<input type="text" class="form-control form-control-sm text-center border-0 quantity-input" value="@item.SoLuong" readonly>
-								<div class="input-group-btn">
-									<button class="btn btn-sm cart-btn-plus rounded-circle bg-light border" type="button">
+									<input type="text" class="form-control text-center border-0 quantity-input fw-bold" value="@item.SoLuong" readonly style="font-size: 1.1rem; color: #2C3E50; background: transparent;">
+									<button class="btn cart-btn-plus" type="button" style="background: linear-gradient(135deg, #FF9500, #FFB84D); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
 										<i class="fa fa-plus"></i>
 									</button>
 								</div>
-							</div>
-						</td>
-							<td>
-								<p class="mb-0 mt-4 item-total">@item.ThanhTien.ToString("N0") VN�</p>
 							</td>
-						<td>
-							<button type="button" class="btn btn-md rounded-circle bg-light border mt-4 btn-remove-item" data-product-id="@item.MaHh">
-								<i class="fa fa-times text-danger"></i>
-							</button>
-						</td>						</tr>
+							<td class="align-middle">
+								<p class="mb-0 fw-bold item-total" style="color: #27AE60; font-size: 1.15rem;">@item.ThanhTien.ToString("N0") VNĐ</p>
+							</td>
+							<td class="align-middle pe-4">
+								<button type="button" class="btn btn-remove-item" data-product-id="@item.MaHh" style="background-color: #FFE5E5; border: 2px solid #FF4444; color: #FF4444; width: 40px; height: 40px; border-radius: 50%; transition: all 0.3s;" onmouseover="this.style.backgroundColor='#FF4444'; this.style.color='white'; this.style.transform='rotate(90deg)'" onmouseout="this.style.backgroundColor='#FFE5E5'; this.style.color='#FF4444'; this.style.transform='rotate(0deg)'">
+									<i class="fa fa-trash"></i>
+								</button>
+							</td>
+						</tr>
 					}
 				</tbody>
 			</table>
 		</div>
-		<div class="row g-4 justify-content-center mt-5">
-			<div class="col-sm-10 col-md-8 col-lg-6">
-				<div class="bg-light rounded">
+		<div class="row g-4 justify-content-end mt-4">
+			<div class="col-sm-12 col-md-8 col-lg-5">
+				<div class="shadow-lg" style="background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F0 100%); border-radius: 20px; border: 2px solid #FF9500;">
+					<div class="p-4" style="background: linear-gradient(135deg, #FF9500 0%, #FFB84D 100%); border-radius: 18px 18px 0 0;">
+						<h2 class="mb-0 text-center text-white fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+							<i class="fa fa-receipt me-2"></i>Tổng đơn hàng
+						</h2>
+					</div>
 					<div class="p-4">
-						<h1 class="display-6 mb-4 text-center">T?ng <span class="fw-normal">don h�ng</span></h1>
-						<div class="d-flex justify-content-between mb-4">
-							<h5 class="mb-0 me-4">T?m t�nh:</h5>
-							<p class="mb-0 cart-subtotal">@Model.Sum(p => p.ThanhTien).ToString("N0") VN�</p>
+						<div class="d-flex justify-content-between mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+							<h5 class="mb-0 fw-semibold" style="color: #2C3E50;"><i class="fa fa-list-alt me-2 text-warning"></i>Tạm tính:</h5>
+							<p class="mb-0 cart-subtotal fw-bold" style="color: #FF9500; font-size: 1.2rem;">@Model.Sum(p => p.ThanhTien).ToString("N0") VNĐ</p>
 						</div>
-						<div class="d-flex justify-content-between">
-							<h5 class="mb-0 me-4">Ph� v?n chuy?n:</h5>
-							<p class="mb-0 shipping-fee">@{
+						<div class="d-flex justify-content-between mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
+							<h5 class="mb-0 fw-semibold" style="color: #2C3E50;"><i class="fa fa-shipping-fast me-2 text-info"></i>Phí vận chuyển:</h5>
+							<p class="mb-0 shipping-fee fw-bold" style="color: #3498DB; font-size: 1.1rem;">@{
 								var currentSubtotal = Model.Sum(p => p.ThanhTien);
 								var currentShippingFee = currentSubtotal > 0 ? (currentSubtotal >= 500000 ? 0 : 35000) : 0;
-							}@(currentShippingFee == 0 ? "Mi?n ph�" : currentShippingFee.ToString("N0") + " VN�")</p>
+							}@(currentShippingFee == 0 ? "Miễn phí" : currentShippingFee.ToString("N0") + " VNĐ")</p>
+						</div>
+						@if (currentSubtotal < 500000 && currentSubtotal > 0)
+						{
+							<div class="alert alert-info mb-3" style="background-color: #E3F2FD; border: none; border-radius: 10px;">
+								<i class="fa fa-info-circle me-2"></i>
+								<small>Mua thêm <strong>@((500000 - currentSubtotal).ToString("N0")) VNĐ</strong> để được miễn phí vận chuyển!</small>
+							</div>
+						}
+					</div>
+					<div class="px-4 py-3" style="background-color: #FFF4E6; border-top: 2px solid #FF9500;">
+						<div class="d-flex justify-content-between align-items-center">
+							<h4 class="mb-0 fw-bold" style="color: #2C3E50;"><i class="fa fa-money-bill-wave me-2 text-success"></i>Tổng cộng:</h4>
+							<h3 class="mb-0 fw-bold cart-total" style="color: #27AE60; font-size: 1.8rem;">@{
+								var subtotal = Model.Sum(p => p.ThanhTien);
+								var shippingFee = subtotal > 0 ? (subtotal >= 500000 ? 0 : 35000) : 0;
+								var total = subtotal + shippingFee;
+							}@total.ToString("N0") VNĐ</h3>
 						</div>
 					</div>
-					<div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-						<h5 class="mb-0 ps-4 me-4">T?ng c?ng:</h5>
-						<p class="mb-0 pe-4 fw-bold cart-total">@{
-							var subtotal = Model.Sum(p => p.ThanhTien);
-							var shippingFee = subtotal > 0 ? (subtotal >= 500000 ? 0 : 35000) : 0;
-							var total = subtotal + shippingFee;
-						}@total.ToString("N0") VN�</p>
-					</div>
-					<div class="text-center mb-4">
+					<div class="text-center p-4">
 						@if (User.Identity?.IsAuthenticated == true)
 						{
-							<a asp-action="Index" asp-controller="Checkout" class="btn text-white rounded-pill px-5 py-3 text-uppercase" style="background-color: #FF9500; border: none; font-weight: 600;">
-								<i class="fa fa-credit-card me-2"></i>Thanh to�n
+							<a asp-action="Index" asp-controller="Checkout" class="btn text-white rounded-pill px-5 py-3 text-uppercase w-100 shadow" style="background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%); border: none; font-weight: 700; font-size: 1.1rem; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+								<i class="fa fa-check-circle me-2"></i>Tiến hành thanh toán
 							</a>
 						}
 						else
 						{
-							<a asp-action="DangNhap" asp-controller="KhachHang" class="btn text-white rounded-pill px-5 py-3 text-uppercase" style="background-color: #FF9500; border: none; font-weight: 600;">
-								<i class="fa fa-sign-in-alt me-2"></i>�ang nh?p d? thanh to�n
+							<a asp-action="DangNhap" asp-controller="KhachHang" class="btn text-white rounded-pill px-5 py-3 text-uppercase w-100 shadow" style="background: linear-gradient(135deg, #3498DB 0%, #5DADE2 100%); border: none; font-weight: 700; font-size: 1.1rem; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+								<i class="fa fa-sign-in-alt me-2"></i>Đăng nhập để thanh toán
 							</a>
 						}
+						<a asp-action="Index" asp-controller="HangHoa" class="btn btn-outline-secondary rounded-pill px-4 py-2 mt-3 w-100" style="font-weight: 600; border: 2px solid #95A5A6; transition: all 0.3s;" onmouseover="this.style.backgroundColor='#95A5A6'; this.style.color='white'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#6C757D'">
+							<i class="fa fa-arrow-left me-2"></i>Tiếp tục mua hàng
+						</a>
 					</div>
 				</div>
 			</div>
@@ -160,7 +173,7 @@
 				e.preventDefault();
 				e.stopPropagation();
 				
-				if (!confirm('B?n c� ch?c mu?n x�a s?n ph?m n�y kh?i gi? h�ng?')) {
+				if (!confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) {
 					return;
 				}
 
@@ -191,11 +204,11 @@
 								$('.cart-count').text(response.cartCount);
 							}
 						} else {
-							alert(response.message || 'C� l?i x?y ra!');
+							alert(response.message || 'Có lỗi xảy ra!');
 						}
 					},
 					error: function() {
-						alert('C� l?i x?y ra khi x�a s?n ph?m!');
+						alert('Có lỗi xảy ra khi xóa sản phẩm!');
 					}
 				});
 			});
@@ -212,7 +225,7 @@
 							
 							// Update item total
 							var itemTotal = newQty * price;
-							container.closest('tr').find('.item-total').text(itemTotal.toLocaleString('vi-VN') + ' VN�');
+							container.closest('tr').find('.item-total').text(itemTotal.toLocaleString('vi-VN') + ' VNĐ');
 							
 							// Update cart totals
 							updateCartTotals(response.cartTotal, response.shippingFee);
@@ -222,28 +235,28 @@
 								$('.cart-count').text(response.cartCount);
 							}
 						} else {
-							alert(response.message || 'C� l?i x?y ra!');
+							alert(response.message || 'Có lỗi xảy ra!');
 						}
 					},
 					error: function() {
-						alert('C� l?i x?y ra khi c?p nh?t s? lu?ng!');
+						alert('Có lỗi xảy ra khi cập nhật số lượng!');
 					}
 				});
 			}
 
 			function updateCartTotals(subtotal, shippingFee) {
-				$('.cart-subtotal').text(subtotal.toLocaleString('vi-VN') + ' VN�');
+				$('.cart-subtotal').text(subtotal.toLocaleString('vi-VN') + ' VNĐ');
 				
 				// Update shipping fee
 				if (subtotal === 0 || shippingFee === 0) {
-					$('.shipping-fee').text('Mi?n ph�');
+					$('.shipping-fee').text('Miễn phí');
 				} else {
-					$('.shipping-fee').text(shippingFee.toLocaleString('vi-VN') + ' VN�');
+					$('.shipping-fee').text(shippingFee.toLocaleString('vi-VN') + ' VNĐ');
 				}
 				
 				// Update total
 				var total = subtotal + shippingFee;
-				$('.cart-total').text(total.toLocaleString('vi-VN') + ' VN�');
+				$('.cart-total').text(total.toLocaleString('vi-VN') + ' VNĐ');
 			}
 		});
 	</script>

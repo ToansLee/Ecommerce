@@ -91,7 +91,7 @@ namespace ECommerceMVC.Controllers
 			{
 				if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
 				{
-					return Json(new { success = false, message = "Seller kh�ng du?c mua h�ng" });
+					return Json(new { success = false, message = "Seller không được mua hàng" });
 				}
 				return RedirectToAction("Index", "Seller");
 			}
@@ -101,9 +101,9 @@ namespace ECommerceMVC.Controllers
 			{
 				if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
 				{
-					return Json(new { success = false, message = $"Kh�ng t�m th?y s?n ph?m c� m� {id}" });
+					return Json(new { success = false, message = $"Không tìm thấy sản phẩm có mã {id}" });
 				}
-				TempData["Message"] = $"Kh�ng t�m th?y menu item c� m� {id}";
+				TempData["Message"] = $"Không tìm thấy menu item có mã {id}";
 				return Redirect("/404");
 			}
 
@@ -137,7 +137,7 @@ namespace ECommerceMVC.Controllers
 				return Json(new 
 				{ 
 					success = true, 
-					message = "�� th�m s?n ph?m v�o gi? h�ng!",
+					message = "Đã thêm sản phẩm vào giỏ hàng!",
 					cartCount = totalItems
 				});
 			}

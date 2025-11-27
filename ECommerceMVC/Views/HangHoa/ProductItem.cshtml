@@ -3,20 +3,22 @@
 @foreach (var item in Model)
 {
 	<div class="col-md-6 col-lg-6 col-xl-4">
-		<div class="rounded position-relative fruite-item">
-			<div class="fruite-img">
+		<div class="rounded position-relative fruite-item h-100 d-flex flex-column">
+			<div class="fruite-img" style="height: 200px; overflow: hidden;">
 				<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh">
-					<img src="~/Hinh/HangHoa/@item.Hinh" class="img-fluid w-100 rounded-top" alt="@item.TenHH">
+					<img src="~/Hinh/HangHoa/@item.Hinh" class="w-100 h-100 rounded-top" style="object-fit: cover;" alt="@item.TenHH">
 				</a>
 			</div>
-			<div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">@item.TenLoai</div>
-			<div class="p-4 border border-secondary border-top-0 rounded-bottom">
-				<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh"><h4>@item.TenHH</h4></a>
-				<p>@item.MoTaNgan</p>
-			<div class="d-flex justify-content-between flex-lg-wrap">
-				<p class="text-dark fs-5 fw-bold mb-0">@item.DonGia.ToString("N0") VNĐ</p>
-				<a asp-action="AddToCart" asp-controller="Cart" asp-route-id="@item.MaHh" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Đưa vào giỏ</a>
-			</div>
+			<div class="text-white bg-warning px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">@item.TenLoai</div>
+			<div class="p-4 border border-secondary border-top-0 rounded-bottom flex-grow-1 d-flex flex-column">
+				<h4 style="height: 48px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+					<a asp-action="Detail" asp-controller="HangHoa" asp-route-id="@item.MaHh" style="text-decoration: none; color: inherit;">@item.TenHH</a>
+				</h4>
+				<p style="height: 60px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">@item.MoTaNgan</p>
+				<div class="d-flex justify-content-between flex-lg-wrap mt-auto">
+					<p class="text-dark fs-5 fw-bold mb-0">@item.DonGia.ToString("N0") VNĐ</p>
+					<a asp-action="AddToCart" asp-controller="Cart" asp-route-id="@item.MaHh" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Đưa vào giỏ</a>
+				</div>
 			</div>
 		</div>
 	</div>

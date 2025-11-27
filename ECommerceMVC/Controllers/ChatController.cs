@@ -17,15 +17,15 @@ namespace ECommerceMVC.Controllers
             db = context;
         }
 
-        // Customer chat with Seller
+        // Customer chat with Admin
         public async Task<IActionResult> Index()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-            var isSeller = User.IsInRole("Seller");
+            var isAdmin = User.IsInRole("Admin");
 
-            if (isSeller)
+            if (isAdmin)
             {
-                // Seller sees list of customers who messaged them
+                // Admin sees list of customers who messaged them
                 var customers = await db.ChatMessages
                     .Where(m => m.ReceiverId == userId || m.SenderId == userId)
                     .Select(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
@@ -33,25 +33,29 @@ namespace ECommerceMVC.Controllers
                     .ToListAsync();
 
                 var customerList = await db.Customers
-                    .Where(c => customers.Contains(c.Id))
+                    .Where(c => customers.Contains(c.Id) && c.Role == "Customer")
+                    .OrderByDescending(c => db.ChatMessages
+                        .Where(msg => (msg.SenderId == c.Id && msg.ReceiverId == userId) || 
+                                     (msg.SenderId == userId && msg.ReceiverId == c.Id))
+                        .Max(msg => msg.SentAt))
                     .ToListAsync();
 
-                return View("SellerChat", customerList);
+                return View("AdminChat", customerList);
             }
             else
             {
-                // Customer chats with first seller found
-                var seller = await db.Customers
-                    .FirstOrDefaultAsync(c => c.Role == "Seller");
+                // Customer chats with Admin
+                var admin = await db.Customers
+                    .FirstOrDefaultAsync(c => c.Role == "Admin");
 
-                if (seller == null)
+                if (admin == null)
                 {
-                    TempData["Error"] = "Không tìm thấy người bán";
+                    TempData["Error"] = "Không tìm thấy quản trị viên. Vui lòng thử lại sau.";
                     return RedirectToAction("Index", "Home");
                 }
 
-                ViewBag.SellerId = seller.Id;
-                ViewBag.SellerName = seller.FullName;
+                ViewBag.AdminId = admin.Id;
+                ViewBag.AdminName = admin.FullName;
                 return View("CustomerChat");
             }
         }

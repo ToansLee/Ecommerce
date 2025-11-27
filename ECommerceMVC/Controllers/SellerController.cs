@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace ECommerceMVC.Controllers
 {
-	[Authorize(Roles = "Seller")]
+	[Authorize(Roles = "Admin")]
 	public class SellerController : Controller
 	{
 		private readonly FoodOrderingContext db;
@@ -20,106 +20,50 @@ namespace ECommerceMVC.Controllers
 		// Dashboard
 		public async Task<IActionResult> Index()
 		{
-			var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var restaurant = await db.Restaurants
-				.Include(r => r.MenuItems)
-				.Include(r => r.Orders)
-				.FirstOrDefaultAsync(r => r.SellerId == sellerId);
+			// Admin có thể quản lý tất cả sản phẩm và đơn hàng
+			var totalMenuItems = await db.MenuItems.CountAsync();
+			var totalOrders = await db.Orders.CountAsync();
+			var totalRevenue = await db.Orders
+				.Where(o => o.Status == "Delivered")
+				.SumAsync(o => (double?)o.TotalAmount) ?? 0;
 
-			if (restaurant == null)
-			{
-				return RedirectToAction("CreateRestaurant");
-			}
+			ViewBag.TotalMenuItems = totalMenuItems;
+			ViewBag.TotalOrders = totalOrders;
+			ViewBag.TotalRevenue = totalRevenue;
+			ViewBag.RestaurantName = "Admin Dashboard";
 
-			ViewBag.TotalMenuItems = restaurant.MenuItems.Count;
-			ViewBag.TotalOrders = restaurant.Orders.Count;
-			ViewBag.TotalRevenue = restaurant.TotalRevenue;
-			ViewBag.RestaurantName = restaurant.Name;
-
-			return View(restaurant);
+			return View();
 		}
 
 		// Tạo nhà hàng cho seller mới
 		[HttpGet]
-		public IActionResult CreateRestaurant()
-		{
-			return View();
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> CreateRestaurant(Restaurant model)
-		{
-			if (ModelState.IsValid)
-			{
-				var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-				
-				// Kiểm tra seller đã có restaurant chưa
-				if (await db.Restaurants.AnyAsync(r => r.SellerId == sellerId))
-				{
-					ModelState.AddModelError("", "Bạn đã có nhà hàng rồi");
-					return View(model);
-				}
-
-				model.SellerId = sellerId;
-				model.CreatedAt = DateTime.Now;
-				model.IsActive = true;
-
-				db.Restaurants.Add(model);
-				await db.SaveChangesAsync();
-				
-				return RedirectToAction("Index");
-			}
-			return View(model);
-		}
-
 		// Quản lý món ăn
 		public async Task<IActionResult> MenuItems()
 		{
-			var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var restaurant = await db.Restaurants
-				.Include(r => r.MenuItems)
-				.ThenInclude(m => m.Category)
-				.FirstOrDefaultAsync(r => r.SellerId == sellerId);
+			// Admin xem tất cả món ăn
+			var menuItems = await db.MenuItems
+				.Include(m => m.Category)
+				.OrderByDescending(m => m.CreatedAt)
+				.ToListAsync();
 
-			if (restaurant == null)
-			{
-				return RedirectToAction("CreateRestaurant");
-			}
-
-			return View(restaurant.MenuItems.OrderByDescending(m => m.CreatedAt).ToList());
+			return View(menuItems);
 		}
 
 		// Thêm món ăn
 		[HttpGet]
 		public async Task<IActionResult> CreateMenuItem()
 		{
-			var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var restaurant = await db.Restaurants.FirstOrDefaultAsync(r => r.SellerId == sellerId);
-
-			if (restaurant == null)
-			{
-				return RedirectToAction("CreateRestaurant");
-			}
-
 			ViewBag.Categories = await db.MenuCategories.ToListAsync();
-			ViewBag.RestaurantId = restaurant.Id;
 			return View();
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> CreateMenuItem(MenuItem model, IFormFile? imageFile)
 		{
-			var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var restaurant = await db.Restaurants.FirstOrDefaultAsync(r => r.SellerId == sellerId);
-
-			if (restaurant == null)
+			if (ModelState.IsValid)
 			{
-				return RedirectToAction("CreateRestaurant");
-			}
-
-		if (ModelState.IsValid)
-		{
-			model.CreatedAt = DateTime.Now;				// Xử lý upload ảnh
+				model.CreatedAt = DateTime.Now;
+				// Xử lý upload ảnh
 				if (imageFile != null)
 				{
 					var fileName = DateTime.Now.Ticks.ToString() + Path.GetExtension(imageFile.FileName);
@@ -150,7 +94,6 @@ namespace ECommerceMVC.Controllers
 			}
 
 			ViewBag.Categories = await db.MenuCategories.ToListAsync();
-			ViewBag.RestaurantId = restaurant.Id;
 			return View(model);
 		}
 
@@ -173,14 +116,6 @@ namespace ECommerceMVC.Controllers
 		[HttpPost]
 		public async Task<IActionResult> EditMenuItem(MenuItem model, IFormFile? imageFile)
 		{
-			var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var restaurant = await db.Restaurants.FirstOrDefaultAsync(r => r.SellerId == sellerId);
-
-			if (restaurant == null)
-			{
-				return RedirectToAction("CreateRestaurant");
-			}
-
 			var menuItem = await db.MenuItems
 				.FirstOrDefaultAsync(m => m.Id == model.Id);
 
@@ -265,30 +200,6 @@ namespace ECommerceMVC.Controllers
 			await db.SaveChangesAsync();
 
 			return Json(new { success = true, message = "Đã xóa món ăn thành công" });
-		}
-
-		// Doanh thu
-		public async Task<IActionResult> Revenue()
-		{
-			var sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var restaurant = await db.Restaurants
-				.Include(r => r.Orders)
-				.FirstOrDefaultAsync(r => r.SellerId == sellerId);
-
-			if (restaurant == null)
-			{
-				return RedirectToAction("CreateRestaurant");
-			}
-
-			var revenues = await db.Revenues
-				.Include(r => r.Order)
-				.Where(r => r.SellerId == sellerId)
-				.OrderByDescending(r => r.CreatedAt)
-				.ToListAsync();
-
-			ViewBag.RestaurantName = restaurant.Name;
-			ViewBag.TotalRevenue = restaurant.TotalRevenue;
-			return View(revenues);
 		}
 
 		// Quản lý đơn hàng

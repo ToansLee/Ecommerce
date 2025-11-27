@@ -1,12 +1,12 @@
 @{
-    ViewData["Title"] = "Chat với người bán";
-    var sellerId = ViewBag.SellerId;
-    var sellerName = ViewBag.SellerName;
+    ViewData["Title"] = "Chat với quản trị viên";
+    var adminId = ViewBag.AdminId;
+    var adminName = ViewBag.AdminName;
 }
 
 <!-- Single Page Header start -->
 <div class="container-fluid page-header py-5" style="background: linear-gradient(135deg, rgba(255, 149, 0, 0.8) 0%, rgba(245, 169, 96, 0.8) 100%), url('/img/cart-page-header-img.jpg') center center/cover no-repeat;">
-    <h1 class="text-center text-white display-6">Chat với người bán</h1>
+    <h1 class="text-center text-white display-6">Chat với quản trị viên</h1>
 </div>
 <!-- Single Page Header End -->
 
@@ -19,7 +19,7 @@
                     <!-- Chat Header -->
                     <div class="card-header" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); border-radius: 15px 15px 0 0; padding: 20px;">
                         <h5 class="text-white mb-0">
-                            <i class="fas fa-user-circle me-2"></i>@sellerName
+                            <i class="fas fa-user-circle me-2"></i>@adminName
                         </h5>
                     </div>
 
@@ -27,14 +27,14 @@
                     <div class="card-body" id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; background-color: #F8F9FA;">
                         <div class="text-center text-muted py-5">
                             <i class="fas fa-comments fa-3x mb-3"></i>
-                            <p>Bắt đầu cuộc trò chuyện với người bán</p>
+                            <p>Bắt đầu cuộc trò chuyện với quản trị viên</p>
                         </div>
                     </div>
 
                     <!-- Chat Input -->
                     <div class="card-footer" style="background-color: white; border-top: 1px solid #dee2e6; border-radius: 0 0 15px 15px; padding: 15px;">
                         <form id="chatForm" class="d-flex gap-2">
-                            <input type="hidden" id="receiverId" value="@sellerId">
+                            <input type="hidden" id="receiverId" value="@adminId">
                             <input type="text" id="messageInput" class="form-control" placeholder="Nhập tin nhắn..." style="border-radius: 25px; border: 2px solid #FFE5CC;" required>
                             <button type="submit" class="btn text-white" style="background-color: #FF9500; border: none; border-radius: 25px; padding: 0.5rem 2rem; white-space: nowrap;">
                                 <i class="fas fa-paper-plane me-1"></i> Gửi
@@ -66,7 +66,7 @@
                             chatMessages.html(`
                                 <div class="text-center text-muted py-5">
                                     <i class="fas fa-comments fa-3x mb-3"></i>
-                                    <p>Bắt đầu cuộc trò chuyện với người bán</p>
+                                    <p>Bắt đầu cuộc trò chuyện với quản trị viên</p>
                                 </div>
                             `);
                         } else {

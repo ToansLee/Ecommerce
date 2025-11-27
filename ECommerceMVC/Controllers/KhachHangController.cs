@@ -317,12 +317,11 @@ namespace ECommerceMVC.Controllers
 				return RedirectToAction("DangNhap");
 			}
 
-			var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-			var customer = await db.Customers
-				.Include(c => c.Restaurant)
-				.FirstOrDefaultAsync(c => c.Id == userId);
+		var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+		var customer = await db.Customers
+			.FirstOrDefaultAsync(c => c.Id == userId);
 
-			if (customer == null)
+		if (customer == null)
 			{
 				await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 				return RedirectToAction("DangNhap");

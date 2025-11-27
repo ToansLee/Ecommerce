@@ -41,12 +41,8 @@ namespace ECommerceMVC.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
         
-        // For sellers - relationship with Restaurant (1-to-1)
-        public Restaurant? Restaurant { get; set; }
-        
-        // For customers - orders and addresses
+        // Relationships
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
-        public ICollection<Revenue> Revenues { get; set; } = new List<Revenue>();
     }
 }
