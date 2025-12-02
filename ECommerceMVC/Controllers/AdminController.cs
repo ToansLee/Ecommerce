@@ -37,15 +37,91 @@ namespace ECommerceMVC.Controllers
 
 		return View();
 	}		// Quản lý món ăn
-		public async Task<IActionResult> MenuItems()
+		public async Task<IActionResult> MenuItems(string? search, int? categoryId, bool? isAvailable, string? sortBy, int page = 1)
 		{
-			// Admin xem tất cả món ăn
-			var menuItems = await db.MenuItems
-				.Include(m => m.Category)
-				.OrderByDescending(m => m.CreatedAt)
+			int pageSize = 10;
+			
+			// Base query
+			var query = db.MenuItems.Include(m => m.Category).AsQueryable();
+
+			// Search
+			if (!string.IsNullOrEmpty(search))
+			{
+				query = query.Where(m => m.Name.Contains(search) || m.Description.Contains(search));
+			}
+
+			// Filter by category
+			if (categoryId.HasValue && categoryId.Value > 0)
+			{
+				query = query.Where(m => m.CategoryId == categoryId.Value);
+			}
+
+			// Filter by availability
+			if (isAvailable.HasValue)
+			{
+				query = query.Where(m => m.IsAvailable == isAvailable.Value);
+			}
+
+			// Sort
+			query = sortBy switch
+			{
+				"name" => query.OrderBy(m => m.Name),
+				"name_desc" => query.OrderByDescending(m => m.Name),
+				"price" => query.OrderBy(m => m.Price),
+				"price_desc" => query.OrderByDescending(m => m.Price),
+				"category" => query.OrderBy(m => m.Category.Name),
+				"date" => query.OrderBy(m => m.CreatedAt),
+				_ => query.OrderByDescending(m => m.CreatedAt)
+			};
+
+			// Pagination
+			var totalItems = await query.CountAsync();
+			var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+			
+			var menuItems = await query
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
 				.ToListAsync();
 
+			// Statistics
+			ViewBag.TotalItems = totalItems;
+			ViewBag.TotalAvailable = await db.MenuItems.CountAsync(m => m.IsAvailable);
+			ViewBag.TotalUnavailable = await db.MenuItems.CountAsync(m => !m.IsAvailable);
+			ViewBag.Categories = await db.MenuCategories.ToListAsync();
+			ViewBag.CategoryStats = await db.MenuItems
+				.GroupBy(m => m.Category.Name)
+				.Select(g => new { Category = g.Key, Count = g.Count() })
+				.ToListAsync();
+
+			// Pagination data
+			ViewBag.CurrentPage = page;
+			ViewBag.TotalPages = totalPages;
+			ViewBag.Search = search;
+			ViewBag.CategoryId = categoryId;
+			ViewBag.IsAvailable = isAvailable;
+			ViewBag.SortBy = sortBy;
+
 			return View(menuItems);
+		}
+
+		// Toggle availability
+		[HttpPost]
+		public async Task<IActionResult> ToggleAvailability(int id)
+		{
+			var menuItem = await db.MenuItems.FindAsync(id);
+			if (menuItem == null)
+			{
+				return Json(new { success = false, message = "Không tìm thấy món ăn" });
+			}
+
+			menuItem.IsAvailable = !menuItem.IsAvailable;
+			await db.SaveChangesAsync();
+
+			return Json(new { 
+				success = true, 
+				message = menuItem.IsAvailable ? "Đã bật món ăn" : "Đã tắt món ăn",
+				isAvailable = menuItem.IsAvailable 
+			});
 		}
 
 		// Thêm món ăn

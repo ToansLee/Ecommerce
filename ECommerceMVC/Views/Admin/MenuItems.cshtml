@@ -12,12 +12,129 @@
 				<h2 style="color: #FF9500; font-weight: 700;">
 					<i class="fas fa-utensils me-2"></i>Quản lý món ăn
 				</h2>
-				<p style="color: #6C757D;">Tổng số: @Model.Count món</p>
+				<p style="color: #6C757D;">Tổng số: @ViewBag.TotalItems món</p>
 			</div>
 			<div class="col-md-4 text-end">
 				<a asp-action="CreateMenuItem" class="btn btn-lg" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); color: white; border-radius: 10px; border: none;">
 					<i class="fas fa-plus-circle me-2"></i>Thêm món mới
 				</a>
+			</div>
+		</div>
+
+		<!-- Statistics Cards -->
+		<div class="row mb-4">
+			<div class="col-md-3 mb-3">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);">
+					<div class="card-body text-white">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<h6 class="mb-1 opacity-75">Còn hàng</h6>
+								<h3 class="mb-0 fw-bold">@ViewBag.TotalAvailable</h3>
+							</div>
+							<i class="fas fa-check-circle fa-2x opacity-50"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 mb-3">
+				<div class="card border-0 shadow-sm" style="border-radius: 15px; background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);">
+					<div class="card-body text-white">
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<h6 class="mb-1 opacity-75">Hết hàng</h6>
+								<h3 class="mb-0 fw-bold">@ViewBag.TotalUnavailable</h3>
+							</div>
+							<i class="fas fa-times-circle fa-2x opacity-50"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+			@foreach (var stat in ViewBag.CategoryStats)
+			{
+				<div class="col-md-3 mb-3">
+					<div class="card border-0 shadow-sm" style="border-radius: 15px; background: #FFF4E6;">
+						<div class="card-body">
+							<div class="d-flex justify-content-between align-items-center">
+								<div>
+									<h6 class="mb-1" style="color: #666;">@stat.Category</h6>
+									<h3 class="mb-0 fw-bold" style="color: #FF9500;">@stat.Count</h3>
+								</div>
+								<i class="fas fa-layer-group fa-2x" style="color: #FFE5CC;"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+
+		<!-- Search and Filter -->
+		<div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+			<div class="card-body p-4">
+				<form method="get" asp-action="MenuItems" id="filterForm">
+					<div class="row g-3">
+						<div class="col-md-4">
+							<label class="form-label fw-bold" style="color: #FF9500;">
+								<i class="fas fa-search me-2"></i>Tìm kiếm
+							</label>
+							<input type="text" class="form-control" name="search" value="@ViewBag.Search" placeholder="Tên món hoặc mô tả..." style="border-radius: 10px; border: 2px solid #FFE5CC;">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label fw-bold" style="color: #FF9500;">
+								<i class="fas fa-list me-2"></i>Danh mục
+							</label>
+							<select class="form-select" name="categoryId" style="border-radius: 10px; border: 2px solid #FFE5CC;">
+								<option value="">Tất cả danh mục</option>
+								@foreach (var cat in ViewBag.Categories)
+								{
+									<option value="@cat.Id" selected="@(ViewBag.CategoryId == cat.Id)">@cat.Name</option>
+								}
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label class="form-label fw-bold" style="color: #FF9500;">
+								<i class="fas fa-toggle-on me-2"></i>Trạng thái
+							</label>
+							<select class="form-select" name="isAvailable" style="border-radius: 10px; border: 2px solid #FFE5CC;">
+								<option value="">Tất cả</option>
+								<option value="true" selected="@(ViewBag.IsAvailable == true)">Còn hàng</option>
+								<option value="false" selected="@(ViewBag.IsAvailable == false)">Hết hàng</option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<label class="form-label fw-bold" style="color: #FF9500;">
+								<i class="fas fa-sort me-2"></i>Sắp xếp
+							</label>
+							<select class="form-select" name="sortBy" style="border-radius: 10px; border: 2px solid #FFE5CC;">
+								<option value="">Mới nhất</option>
+								<option value="name" selected="@(ViewBag.SortBy == "name")">Tên A-Z</option>
+								<option value="name_desc" selected="@(ViewBag.SortBy == "name_desc")">Tên Z-A</option>
+								<option value="price" selected="@(ViewBag.SortBy == "price")">Giá thấp đến cao</option>
+								<option value="price_desc" selected="@(ViewBag.SortBy == "price_desc")">Giá cao đến thấp</option>
+								<option value="category" selected="@(ViewBag.SortBy == "category")">Theo danh mục</option>
+								<option value="date" selected="@(ViewBag.SortBy == "date")">Cũ nhất</option>
+							</select>
+						</div>
+						<div class="col-md-1 d-flex align-items-end">
+							<button type="submit" class="btn w-100" style="background: linear-gradient(135deg, #FF9500 0%, #FF7C1F 100%); color: white; border-radius: 10px; border: none;" title="Áp dụng bộ lọc">
+								<i class="fas fa-filter"></i>
+							</button>
+						</div>
+					</div>
+					@if (!string.IsNullOrEmpty(ViewBag.Search) || ViewBag.CategoryId != null || ViewBag.IsAvailable != null || !string.IsNullOrEmpty(ViewBag.SortBy))
+					{
+						<div class="row mt-3">
+							<div class="col-12">
+								<button type="button" class="btn btn-outline-secondary" onclick="clearFilters()" style="border-radius: 10px;">
+									<i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+								</button>
+								<small class="ms-3" style="color: #6C757D;">
+									<i class="fas fa-info-circle me-1"></i>
+									Đang áp dụng bộ lọc
+								</small>
+							</div>
+						</div>
+					}
+				</form>
 			</div>
 		</div>
 
@@ -80,20 +197,28 @@
 										<strong style="color: #FF9500;">@string.Format("{0:N0}đ", item.Price)</strong>
 									</td>
 										<td style="padding: 1rem; vertical-align: middle;">
-											@if (item.IsAvailable)
-											{
-												<span class="badge bg-success">Còn hàng</span>
-											}
-											else
-											{
-												<span class="badge bg-secondary">Hết hàng</span>
-											}
+											<div class="form-check form-switch">
+												<input class="form-check-input" type="checkbox" id="toggle_@item.Id" 
+													   @(item.IsAvailable ? "checked" : "") 
+													   onchange="toggleAvailability(@item.Id)"
+													   style="cursor: pointer; width: 3rem; height: 1.5rem;">
+												<label class="form-check-label ms-2" for="toggle_@item.Id" id="label_@item.Id">
+													@if (item.IsAvailable)
+													{
+														<span class="badge bg-success">Còn hàng</span>
+													}
+													else
+													{
+														<span class="badge bg-secondary">Hết hàng</span>
+													}
+												</label>
+											</div>
 										</td>
 										<td style="padding: 1rem; vertical-align: middle;" class="text-center">
-											<a asp-action="EditMenuItem" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2" style="border-radius: 8px;">
+											<a asp-action="EditMenuItem" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-2" style="border-radius: 8px;" title="Chỉnh sửa">
 												<i class="fas fa-edit"></i>
 											</a>
-											<button class="btn btn-sm btn-danger" style="border-radius: 8px;" onclick="deleteMenuItem(@item.Id, '@item.Name')">
+											<button class="btn btn-sm btn-danger" style="border-radius: 8px;" onclick="deleteMenuItem(@item.Id, '@item.Name')" title="Xóa">
 												<i class="fas fa-trash"></i>
 											</button>
 										</td>
@@ -105,21 +230,112 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Pagination -->
+		@if (ViewBag.TotalPages > 1)
+		{
+			<div class="d-flex justify-content-between align-items-center mt-4">
+				<div>
+					<p style="color: #6C757D;">
+						Hiển thị <strong>@Model.Count</strong> trong tổng số <strong>@ViewBag.TotalItems</strong> món
+					</p>
+				</div>
+				<nav>
+					<ul class="pagination mb-0">
+						@if (ViewBag.CurrentPage > 1)
+						{
+							<li class="page-item">
+								<a class="page-link" href="@Url.Action("MenuItems", new { 
+									page = ViewBag.CurrentPage - 1, 
+									search = ViewBag.Search, 
+									categoryId = ViewBag.CategoryId, 
+									isAvailable = ViewBag.IsAvailable,
+									sortBy = ViewBag.SortBy 
+								})" style="border-radius: 8px 0 0 8px; border-color: #FFE5CC; color: #FF9500;">
+									<i class="fas fa-chevron-left"></i>
+								</a>
+							</li>
+						}
+
+						@for (int i = 1; i <= ViewBag.TotalPages; i++)
+						{
+							<li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+								<a class="page-link" href="@Url.Action("MenuItems", new { 
+									page = i, 
+									search = ViewBag.Search, 
+									categoryId = ViewBag.CategoryId, 
+									isAvailable = ViewBag.IsAvailable,
+									sortBy = ViewBag.SortBy 
+								})" style="border-color: #FFE5CC; @(i == ViewBag.CurrentPage ? "background-color: #FF9500; border-color: #FF9500; color: white;" : "color: #FF9500;")">
+									@i
+								</a>
+							</li>
+						}
+
+						@if (ViewBag.CurrentPage < ViewBag.TotalPages)
+						{
+							<li class="page-item">
+								<a class="page-link" href="@Url.Action("MenuItems", new { 
+									page = ViewBag.CurrentPage + 1, 
+									search = ViewBag.Search, 
+									categoryId = ViewBag.CategoryId, 
+									isAvailable = ViewBag.IsAvailable,
+									sortBy = ViewBag.SortBy 
+								})" style="border-radius: 0 8px 8px 0; border-color: #FFE5CC; color: #FF9500;">
+									<i class="fas fa-chevron-right"></i>
+								</a>
+							</li>
+						}
+					</ul>
+				</nav>
+			</div>
+		}
 	</div>
 </div>
 
 @section Scripts {
 	<script>
+		function toggleAvailability(id) {
+			$.ajax({
+				url: '@Url.Action("ToggleAvailability", "Admin")',
+				type: 'POST',
+				data: { id: id },
+				success: function (response) {
+					if (response.success) {
+						// Update label
+						const label = $('#label_' + id);
+						if (response.isAvailable) {
+							label.html('<span class="badge bg-success">Còn hàng</span>');
+						} else {
+							label.html('<span class="badge bg-secondary">Hết hàng</span>');
+						}
+						
+						// Show toast notification
+						showToast(response.message, 'success');
+					} else {
+						alert(response.message);
+						// Revert toggle
+						$('#toggle_' + id).prop('checked', !$('#toggle_' + id).prop('checked'));
+					}
+				},
+				error: function () {
+					alert('Có lỗi xảy ra khi thay đổi trạng thái');
+					// Revert toggle
+					$('#toggle_' + id).prop('checked', !$('#toggle_' + id).prop('checked'));
+				}
+			});
+		}
+
 		function deleteMenuItem(id, name) {
-			if (confirm('Bạn có chắc muốn xóa món "' + name + '" không?')) {
+			if (confirm('Bạn có chắc muốn xóa món "' + name + '" không?\n\nLưu ý: Món ăn đã bị xóa không thể khôi phục!')) {
 				$.ajax({
 					url: '@Url.Action("DeleteMenuItem", "Admin")',
 					type: 'POST',
 					data: { id: id },
 					success: function (response) {
 						if (response.success) {
-							alert(response.message);
-							location.reload();
+							showToast(response.message, 'success');
+							setTimeout(() => location.reload(), 1500);
 						} else {
 							alert(response.message);
 						}
@@ -129,6 +345,40 @@
 					}
 				});
 			}
+		}
+
+		function showToast(message, type) {
+			const bgColor = type === 'success' ? '#4CAF50' : '#f44336';
+			const toast = $('<div>')
+				.css({
+					position: 'fixed',
+					top: '20px',
+					right: '20px',
+					background: bgColor,
+					color: 'white',
+					padding: '15px 25px',
+					borderRadius: '10px',
+					boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+					zIndex: 9999,
+					fontWeight: '500'
+				})
+				.html('<i class="fas fa-check-circle me-2"></i>' + message)
+				.appendTo('body')
+				.fadeIn();
+
+			setTimeout(() => {
+				toast.fadeOut(() => toast.remove());
+			}, 3000);
+		}
+
+		// Auto-submit on filter change
+		$('select[name="categoryId"], select[name="isAvailable"], select[name="sortBy"]').on('change', function() {
+			$('#filterForm').submit();
+		});
+
+		// Clear filters
+		function clearFilters() {
+			window.location.href = '@Url.Action("MenuItems", "Admin")';
 		}
 	</script>
 }

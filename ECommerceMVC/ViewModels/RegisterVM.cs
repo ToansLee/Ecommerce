@@ -5,42 +5,42 @@ namespace ECommerceMVC.ViewModels
 	public class RegisterVM
 	{
 		[Key]
-		[Display(Name = "T�n dang nh?p")]
+		[Display(Name = "Tên đăng nhập")]
 		[Required(ErrorMessage = "*")]
-		[MaxLength(20, ErrorMessage = "T?i da 20 k� t?")]
+		[MaxLength(20, ErrorMessage = "Tối đa 20 ký tự")]
 		public string MaKh { get; set; }
 
 
-		[Display(Name ="M?t kh?u")]
+		[Display(Name ="Mật khẩu")]
 		[Required(ErrorMessage = "*")]
 		[DataType(DataType.Password)]
 		public string MatKhau { get; set; }
 
-		[Display(Name ="H? t�n")]
+		[Display(Name ="Họ tên")]
 		[Required(ErrorMessage = "*")]
-		[MaxLength(50, ErrorMessage = "T?i da 50 k� t?")]
+		[MaxLength(50, ErrorMessage = "Tối đa 50 ký tự")]
 		public string HoTen { get; set; }
 
 		public bool GioiTinh { get; set; } = true;
 
-		[Display(Name ="Ng�y sinh")]
+		[Display(Name ="Ngày sinh")]
 		[DataType(DataType.Date)]
 		public DateTime? NgaySinh { get; set; }
 
-		[Display(Name ="�?a ch?")]
-		[MaxLength(60, ErrorMessage = "T?i da 60 k� t?")]
+		[Display(Name ="Địa chỉ")]
+		[MaxLength(60, ErrorMessage = "Tối đa 60 ký tự")]
 		public string DiaChi { get; set; }
 
-	[Display(Name = "�i?n tho?i")]
-	[MaxLength(24, ErrorMessage = "T?i da 24 k� t?")]
-	[RegularExpression(@"0[9875]\d{8}", ErrorMessage ="Chua d�ng d?nh d?ng di d?ng Vi?t Nam")]
+	[Display(Name = "Điện thoại")]
+	[MaxLength(24, ErrorMessage = "Tối đa 24 ký tự")]
+	[RegularExpression(@"0[9875]\d{8}", ErrorMessage ="Chưa đúng định dạng di động Việt Nam")]
 	public string DienThoai { get; set; }
 
-	[Display(Name = "Vai tr�")]
-	[Required(ErrorMessage = "Vui l�ng ch?n vai tr�")]
+	[Display(Name = "Vai trò")]
+	[Required(ErrorMessage = "Vui lòng chọn vai trò")]
 	public string Role { get; set; } = "Customer";
 
-	[EmailAddress(ErrorMessage ="Chua d�ng d?nh d?ng email")]
+	[EmailAddress(ErrorMessage ="Chưa đúng định dạng email")]
 	public string Email { get; set; }
 	}
 }

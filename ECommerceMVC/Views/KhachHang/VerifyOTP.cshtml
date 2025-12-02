@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "XÃ¡c thá»±c OTP";
+    ViewData["Title"] = "Xác thực OTP";
 }
 
 <style>
@@ -160,8 +160,8 @@
             <div class="otp-icon">
                 <i class="fas fa-envelope-open"></i>
             </div>
-            <h2 style="margin: 0; font-size: 28px;">XÃ¡c thá»±c OTP</h2>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Nháº­p mÃ£ OTP Ä‘Ã£ Ä‘Æ°á»£c gá»­i Ä‘áº¿n email cá»§a báº¡n</p>
+            <h2 style="margin: 0; font-size: 28px;">Xác thực OTP</h2>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Nhập mã OTP đã được gửi đến email của bạn</p>
         </div>
 
         <div class="otp-body">
@@ -201,14 +201,14 @@
                 <input type="hidden" name="otp" id="otpValue" />
 
                 <button type="submit" class="btn-verify" id="btnVerify">
-                    <i class="fas fa-check-circle me-2"></i>XÃ¡c thá»±c
+                    <i class="fas fa-check-circle me-2"></i>Xác thực
                 </button>
             </form>
 
             <div class="resend-section">
-                <p style="color: #666; margin-bottom: 10px;">KhÃ´ng nháº­n Ä‘Æ°á»£c mÃ£?</p>
+                <p style="color: #666; margin-bottom: 10px;">Không nhận được mã?</p>
                 <button type="button" class="btn-resend" id="btnResend" onclick="resendOTP()">
-                    Gá»­i láº¡i mÃ£ OTP
+                    Gửi lại mã OTP
                 </button>
                 <div class="countdown" id="countdown"></div>
             </div>
@@ -223,7 +223,7 @@
     const btnResend = document.getElementById('btnResend');
     const countdownDiv = document.getElementById('countdown');
 
-    // Auto-focus vÃ  di chuyá»ƒn giá»¯a cÃ¡c Ã´ input
+    // Tự động focus và di chuyển giữa các ô input
     otpInputs.forEach((input, index) => {
         input.addEventListener('input', (e) => {
             const value = e.target.value;
@@ -264,16 +264,16 @@
     }
 
     // Countdown timer
-    let countdown = 300; // 5 phÃºt
+    let countdown = 300; // 5 phút
     const timer = setInterval(() => {
         countdown--;
         const minutes = Math.floor(countdown / 60);
         const seconds = countdown % 60;
-        countdownDiv.textContent = `MÃ£ OTP háº¿t háº¡n sau: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        countdownDiv.textContent = `Mã OTP hết hạn sau: ${minutes}:${seconds.toString().padStart(2, '0')}`;
 
         if (countdown <= 0) {
             clearInterval(timer);
-            countdownDiv.innerHTML = '<span style="color: #FF9500;">MÃ£ OTP Ä‘Ã£ háº¿t háº¡n</span>';
+            countdownDiv.innerHTML = '<span style="color: #FF9500;">Mã OTP đã hết hạn</span>';
             btnVerify.disabled = true;
         }
     }, 1000);
@@ -300,14 +300,14 @@
                 countdown = 300;
                 btnVerify.disabled = false;
                 
-                // Cooldown 60 giÃ¢y trÆ°á»›c khi gá»­i láº¡i
+                // Giãn cách 60 giây trước khi gửi lại
                 resendCooldown = 60;
                 const cooldownTimer = setInterval(() => {
                     resendCooldown--;
-                    btnResend.textContent = `Gá»­i láº¡i sau ${resendCooldown}s`;
+                    btnResend.textContent = `Gửi lại sau ${resendCooldown}s`;
                     if (resendCooldown <= 0) {
                         clearInterval(cooldownTimer);
-                        btnResend.textContent = 'Gá»­i láº¡i mÃ£ OTP';
+                        btnResend.textContent = 'Gửi lại mã OTP';
                         btnResend.disabled = false;
                     }
                 }, 1000);
@@ -317,11 +317,11 @@
             }
         })
         .catch(error => {
-            alert('CÃ³ lá»—i xáº£y ra khi gá»­i láº¡i OTP');
+            alert('Có lỗi xảy ra khi gửi lại OTP');
             btnResend.disabled = false;
         });
     }
 
-    // Auto-focus Ã´ Ä‘áº§u tiÃªn
+    // Tự động focus ô đầu tiên
     otpInputs[0].focus();
 </script>
