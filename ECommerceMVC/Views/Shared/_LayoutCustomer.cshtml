@@ -74,7 +74,13 @@
 								<a asp-controller="KhachHang" asp-action="DangNhap" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "KhachHang" && ViewContext.RouteData.Values["Action"]?.ToString() == "DangNhap" ? "active" : "")">Đăng nhập</a>
 							}
 							
-							<a asp-controller="Chat" asp-action="Index" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chat" ? "active" : "")">Liên hệ</a>
+							@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Customer"))
+							{
+								<a asp-controller="Chat" asp-action="Chatbot" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chat" && ViewContext.RouteData.Values["Action"]?.ToString() == "Chatbot" ? "active" : "")">
+									<i class="fas fa-robot me-1"></i>Trợ lý AI
+								</a>
+							}
+							<a asp-controller="Chat" asp-action="Index" class="nav-item nav-link navbar-custom-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Chat" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")">Liên hệ</a>
 						</div>
 						<div class="d-flex m-3 me-0 ms-auto align-items-center">
 							<button class="btn-search btn border btn-md-square rounded-circle me-4" data-bs-toggle="modal" data-bs-target="#searchModal" style="background-color: #FFF4E6; border-color: #FFE5CC !important;"><i class="fas fa-search" style="color: #FF9500;"></i></button>								@* Chỉ hiện giỏ hàng cho Customer *@
@@ -100,6 +106,7 @@
 											{
 												<li><a asp-controller="KhachHang" asp-action="Profile" class="dropdown-item navbar-dropdown-item"><i class="fas fa-user me-2" style="color: #FF9500;"></i>Thông tin tài khoản</a></li>
 												<li><a asp-controller="Order" asp-action="Index" class="dropdown-item navbar-dropdown-item"><i class="fas fa-shopping-bag me-2" style="color: #FF9500;"></i>Lịch sử đơn hàng</a></li>
+												<li><a asp-controller="Chat" asp-action="Chatbot" class="dropdown-item navbar-dropdown-item"><i class="fas fa-robot me-2" style="color: #FF9500;"></i>Trợ lý AI - Chọn món</a></li>
 												<li><a asp-controller="Chat" asp-action="Index" class="dropdown-item navbar-dropdown-item"><i class="fas fa-comments me-2" style="color: #FF9500;"></i>Chat với người bán</a></li>
 												<li><hr class="dropdown-divider" style="border-color: #FFE5CC;"></li>
 											}

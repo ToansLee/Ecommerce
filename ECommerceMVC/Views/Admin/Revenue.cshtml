@@ -114,8 +114,13 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button onclick="loadRevenueChart()" class="btn btn-primary w-100">
+                            <button onclick="loadRevenueChart()" class="btn text-white w-100" style="background-color: #FF9500; border: none;">
                                 <i class="fas fa-sync-alt me-1"></i>Cập nhật
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetFilters()" style="border-radius: 10px;">
+                                <i class="fas fa-times-circle me-2"></i>Đặt lại bộ lọc
                             </button>
                         </div>
                     </div>
@@ -241,6 +246,14 @@
                 $('#monthFilter').hide();
             }
         });
+
+        function resetFilters() {
+            $('#periodSelect').val('month');
+            $('#yearSelect').val('@DateTime.Now.Year');
+            $('#monthSelect').val('@DateTime.Now.Month');
+            $('#monthFilter').show();
+            loadRevenueChart();
+        }
 
         function loadRevenueChart() {
             const period = $('#periodSelect').val();

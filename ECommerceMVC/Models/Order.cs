@@ -22,10 +22,6 @@ namespace ECommerceMVC.Models
         [MaxLength(20)]
         public string Status { get; set; } = "Pending";
         
-        [ForeignKey(nameof(Address))]
-        public int? AddressId { get; set; }
-        public Address? Address { get; set; }
-        
         public Payment? Payment { get; set; }
         
         [MaxLength(500)]

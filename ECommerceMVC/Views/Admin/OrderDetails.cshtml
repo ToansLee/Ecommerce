@@ -16,9 +16,17 @@
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="color: #FF9500;"><i class="fas fa-receipt me-2"></i>Chi tiết đơn hàng #@Model.Id</h2>
-        <a asp-action="Orders" class="btn text-white" style="background-color: #FF9500; border: none;">
-            <i class="fa fa-arrow-left me-2"></i>Quay lại
-        </a>
+        <div>
+            @if (Model.Status != "Cancelled")
+            {
+                <a asp-action="ExportInvoice" asp-route-id="@Model.Id" class="btn btn-success me-2" style="border-radius: 8px;">
+                    <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn PDF
+                </a>
+            }
+            <a asp-action="Orders" class="btn text-white" style="background-color: #FF9500; border: none; border-radius: 8px;">
+                <i class="fa fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
     </div>
 
     <div class="row">
@@ -149,8 +157,14 @@
                         }
                         @if (Model.Status != "Delivered" && Model.Status != "Cancelled")
                         {
-                            <button class="btn btn-danger" onclick="updateStatus(@Model.Id, 'Cancelled')">
+                            <button class="btn btn-danger" onclick="showCancelModal(@Model.Id)">
                                 <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
+                            </button>
+                        }
+                        @if (Model.Status == "Cancelled" || (Model.Status == "Delivered" && Model.CreatedAt <= DateTime.UtcNow.AddDays(-30)))
+                        {
+                            <button class="btn btn-outline-danger" onclick="deleteOrder(@Model.Id)">
+                                <i class="fas fa-trash me-2"></i>Xóa đơn hàng
                             </button>
                         }
                     </div>
@@ -160,14 +174,35 @@
     </div>
 </div>
 
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #FFF4E6;">
+                <h5 class="modal-title" style="color: #FF9500;">Hủy đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Lý do hủy đơn:</label>
+                <textarea id="cancelReason" class="form-control" rows="3" placeholder="Nhập lý do hủy đơn (không bắt buộc)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Xác nhận hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        var currentOrderId = 0;
+
         function updateStatus(orderId, status) {
             var statusText = {
                 'Preparing': 'Chuẩn bị món',
                 'Delivering': 'Đang giao',
-                'Delivered': 'Hoàn thành',
-                'Cancelled': 'Hủy đơn'
+                'Delivered': 'Hoàn thành'
             };
 
             if (confirm('Bạn có chắc muốn cập nhật trạng thái thành "' + statusText[status] + '"?')) {
@@ -185,6 +220,54 @@
                     },
                     error: function() {
                         alert('Có lỗi xảy ra khi cập nhật trạng thái!');
+                    }
+                });
+            }
+        }
+
+        function showCancelModal(orderId) {
+            currentOrderId = orderId;
+            var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            modal.show();
+        }
+
+        function confirmCancel() {
+            var reason = document.getElementById('cancelReason').value;
+            
+            $.ajax({
+                url: '@Url.Action("CancelOrder", "Admin")',
+                type: 'POST',
+                data: { id: currentOrderId, reason: reason },
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    alert('Có lỗi xảy ra khi hủy đơn hàng!');
+                }
+            });
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm('Bạn có chắc muốn XÓA VĨNH VIỄN đơn hàng này? Hành động này không thể hoàn tác!')) {
+                $.ajax({
+                    url: '@Url.Action("DeleteOrder", "Admin")',
+                    type: 'POST',
+                    data: { id: orderId },
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            window.location.href = '@Url.Action("Orders", "Admin")';
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Có lỗi xảy ra khi xóa đơn hàng!');
                     }
                 });
             }

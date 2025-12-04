@@ -107,6 +107,12 @@
                 </div>
 
                 <div class="text-center mt-4">
+                    @if (Model.Status != "Cancelled")
+                    {
+                        <a asp-action="ExportInvoice" asp-route-id="@Model.Id" class="btn btn-lg btn-success me-3" style="border: none; border-radius: 50px; padding: 12px 40px;">
+                            <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn PDF
+                        </a>
+                    }
                     <a asp-action="Index" class="btn btn-lg text-white" style="background-color: #FF9500; border: none; border-radius: 50px; padding: 12px 40px;">
                         <i class="fa fa-arrow-left me-2"></i>Quay lại lịch sử
                     </a>

@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<FoodChatbotService>();
 builder.Services.AddDbContext<ECommerceMVC.Data.FoodOrderingContext>(options => {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("FoodOrdering"));
 });

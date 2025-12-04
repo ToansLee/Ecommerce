@@ -47,7 +47,7 @@ namespace ECommerceMVC.Controllers
 			// Search
 			if (!string.IsNullOrEmpty(search))
 			{
-				query = query.Where(m => m.Name.Contains(search) || m.Description.Contains(search));
+				query = query.Where(m => m.Name.Contains(search) || (m.Description != null && m.Description.Contains(search)));
 			}
 
 			// Filter by category
@@ -69,7 +69,7 @@ namespace ECommerceMVC.Controllers
 				"name_desc" => query.OrderByDescending(m => m.Name),
 				"price" => query.OrderBy(m => m.Price),
 				"price_desc" => query.OrderByDescending(m => m.Price),
-				"category" => query.OrderBy(m => m.Category.Name),
+				"category" => query.OrderBy(m => m.Category!.Name),
 				"date" => query.OrderBy(m => m.CreatedAt),
 				_ => query.OrderByDescending(m => m.CreatedAt)
 			};
@@ -89,7 +89,8 @@ namespace ECommerceMVC.Controllers
 			ViewBag.TotalUnavailable = await db.MenuItems.CountAsync(m => !m.IsAvailable);
 			ViewBag.Categories = await db.MenuCategories.ToListAsync();
 			ViewBag.CategoryStats = await db.MenuItems
-				.GroupBy(m => m.Category.Name)
+				.Where(m => m.Category != null)
+				.GroupBy(m => m.Category!.Name)
 				.Select(g => new { Category = g.Key, Count = g.Count() })
 				.ToListAsync();
 
@@ -278,15 +279,111 @@ namespace ECommerceMVC.Controllers
 		}
 
 		// Quản lý đơn hàng
-		public async Task<IActionResult> Orders()
+		public async Task<IActionResult> Orders(string? search, string? status, DateTime? fromDate, DateTime? toDate, string? sortBy, int page = 1)
 		{
-			var orders = await db.Orders
+			int pageSize = 10;
+
+			// Base query
+			var query = db.Orders
 				.Include(o => o.Customer)
 				.Include(o => o.Items)
 				.ThenInclude(oi => oi.MenuItem)
 				.Include(o => o.Payment)
-				.OrderByDescending(o => o.CreatedAt)
+				.AsQueryable();
+
+			// Search by order ID or customer name
+			if (!string.IsNullOrEmpty(search))
+			{
+				if (int.TryParse(search, out int orderId))
+				{
+					query = query.Where(o => o.Id == orderId);
+				}
+				else
+				{
+					query = query.Where(o => o.Customer != null && o.Customer.FullName.Contains(search));
+				}
+			}
+
+			// Filter by status
+			if (!string.IsNullOrEmpty(status) && status != "All")
+			{
+				query = query.Where(o => o.Status == status);
+			}
+
+			// Filter by date range
+			if (fromDate.HasValue)
+			{
+				query = query.Where(o => o.CreatedAt.Date >= fromDate.Value.Date);
+			}
+			if (toDate.HasValue)
+			{
+				query = query.Where(o => o.CreatedAt.Date <= toDate.Value.Date);
+			}
+
+			// Sort
+			query = sortBy switch
+			{
+				"id" => query.OrderBy(o => o.Id),
+				"id_desc" => query.OrderByDescending(o => o.Id),
+				"customer" => query.OrderBy(o => o.Customer!.FullName),
+				"customer_desc" => query.OrderByDescending(o => o.Customer!.FullName),
+				"total" => query.OrderBy(o => o.TotalAmount),
+				"total_desc" => query.OrderByDescending(o => o.TotalAmount),
+				"date" => query.OrderBy(o => o.CreatedAt),
+				_ => query.OrderByDescending(o => o.CreatedAt)
+			};
+
+			// Pagination
+			var totalOrders = await query.CountAsync();
+			var totalPages = (int)Math.Ceiling(totalOrders / (double)pageSize);
+
+			var orders = await query
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
 				.ToListAsync();
+
+			// Statistics
+			var allOrders = db.Orders.AsQueryable();
+			
+			// Apply same filters for statistics
+			if (!string.IsNullOrEmpty(search))
+			{
+				if (int.TryParse(search, out int orderId))
+				{
+					allOrders = allOrders.Where(o => o.Id == orderId);
+				}
+				else
+				{
+					allOrders = allOrders.Where(o => o.Customer != null && o.Customer.FullName.Contains(search));
+				}
+			}
+			if (fromDate.HasValue)
+			{
+				allOrders = allOrders.Where(o => o.CreatedAt.Date >= fromDate.Value.Date);
+			}
+			if (toDate.HasValue)
+			{
+				allOrders = allOrders.Where(o => o.CreatedAt.Date <= toDate.Value.Date);
+			}
+
+			ViewBag.TotalOrders = totalOrders;
+			ViewBag.PendingOrders = await allOrders.CountAsync(o => o.Status == "Pending");
+			ViewBag.PreparingOrders = await allOrders.CountAsync(o => o.Status == "Preparing");
+			ViewBag.DeliveringOrders = await allOrders.CountAsync(o => o.Status == "Delivering");
+			ViewBag.DeliveredOrders = await allOrders.CountAsync(o => o.Status == "Delivered");
+			ViewBag.CancelledOrders = await allOrders.CountAsync(o => o.Status == "Cancelled");
+			ViewBag.TotalRevenue = await allOrders
+				.Where(o => o.Status == "Delivered")
+				.SumAsync(o => (double?)o.TotalAmount) ?? 0;
+
+			// Pagination data
+			ViewBag.CurrentPage = page;
+			ViewBag.TotalPages = totalPages;
+			ViewBag.Search = search;
+			ViewBag.Status = status;
+			ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+			ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+			ViewBag.SortBy = sortBy;
 
 			return View(orders);
 		}
@@ -324,6 +421,98 @@ namespace ECommerceMVC.Controllers
 			await db.SaveChangesAsync();
 
 			return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
+		}
+
+		// Xuất hóa đơn PDF
+		public async Task<IActionResult> ExportInvoice(int id)
+		{
+			var order = await db.Orders
+				.Include(o => o.Customer)
+				.Include(o => o.Items)
+					.ThenInclude(oi => oi.MenuItem)
+				.FirstOrDefaultAsync(o => o.Id == id);
+
+			if (order == null)
+			{
+				return NotFound();
+			}
+
+			// Không cho phép xuất hóa đơn cho đơn hàng bị hủy
+			if (order.Status == "Cancelled")
+			{
+				TempData["ErrorMessage"] = "Không thể xuất hóa đơn cho đơn hàng đã bị hủy!";
+				return RedirectToAction("OrderDetails", new { id });
+			}
+
+			try
+			{
+				byte[] pdfBytes = Services.InvoiceService.GenerateInvoice(order);
+				string fileName = $"Invoice_{order.Id}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+				
+				return File(pdfBytes, "application/pdf", fileName);
+			}
+			catch (Exception ex)
+			{
+				TempData["ErrorMessage"] = $"Lỗi khi xuất hóa đơn: {ex.Message}";
+				return RedirectToAction("OrderDetails", new { id });
+			}
+		}
+
+		// Hủy đơn hàng
+		[HttpPost]
+		public async Task<IActionResult> CancelOrder(int id, string? reason)
+		{
+			var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+
+			if (order == null)
+			{
+				return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
+			}
+
+			if (order.Status == "Delivered")
+			{
+				return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành" });
+			}
+
+			if (order.Status == "Cancelled")
+			{
+				return Json(new { success = false, message = "Đơn hàng đã bị hủy trước đó" });
+			}
+
+			order.Status = "Cancelled";
+			if (!string.IsNullOrEmpty(reason))
+			{
+				order.Notes = (order.Notes ?? "") + "\n[Lý do hủy: " + reason + "]";
+			}
+			await db.SaveChangesAsync();
+
+			return Json(new { success = true, message = "Đã hủy đơn hàng thành công" });
+		}
+
+		// Xóa đơn hàng (chỉ cho admin)
+		[HttpPost]
+		public async Task<IActionResult> DeleteOrder(int id)
+		{
+			var order = await db.Orders
+				.Include(o => o.Items)
+				.Include(o => o.Payment)
+				.FirstOrDefaultAsync(o => o.Id == id);
+
+			if (order == null)
+			{
+				return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
+			}
+
+			// Chỉ cho phép xóa đơn hàng đã hủy hoặc đã hoàn thành lâu
+			if (order.Status != "Cancelled" && (order.Status != "Delivered" || order.CreatedAt > DateTime.UtcNow.AddDays(-30)))
+			{
+				return Json(new { success = false, message = "Chỉ có thể xóa đơn hàng đã hủy hoặc đơn hàng đã hoàn thành hơn 30 ngày" });
+			}
+
+			db.Orders.Remove(order);
+			await db.SaveChangesAsync();
+
+			return Json(new { success = true, message = "Đã xóa đơn hàng thành công" });
 		}
 
 		// Chat management - Admin chat with customers
@@ -539,7 +728,6 @@ namespace ECommerceMVC.Controllers
 		{
 			var customer = await db.Customers
 				.Include(c => c.Orders.OrderByDescending(o => o.CreatedAt).Take(10))
-				.Include(c => c.Addresses)
 				.FirstOrDefaultAsync(c => c.Id == id && c.Role == "Customer");
 
 			if (customer == null)

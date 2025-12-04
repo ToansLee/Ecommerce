@@ -15,7 +15,7 @@ namespace ECommerceMVC.Helpers
 				}
 				return Hinh.FileName;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				return string.Empty;
 			}

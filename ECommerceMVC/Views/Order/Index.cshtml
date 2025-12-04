@@ -73,9 +73,15 @@
                                 </div>
 
                                 <div class="col-md-3 text-end">
-                                    <a asp-action="Details" asp-route-id="@order.Id" class="btn text-white" style="background-color: #FF9500; border: none; border-radius: 25px;">
+                                    <a asp-action="Details" asp-route-id="@order.Id" class="btn text-white me-2" style="background-color: #FF9500; border: none; border-radius: 25px;">
                                         <i class="fa fa-eye me-2"></i>Chi tiết
                                     </a>
+                                    @if (order.Status != "Cancelled")
+                                    {
+                                        <a asp-action="ExportInvoice" asp-route-id="@order.Id" class="btn btn-success" style="border-radius: 25px;" title="Xuất hóa đơn PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    }
                                 </div>
                             </div>
 

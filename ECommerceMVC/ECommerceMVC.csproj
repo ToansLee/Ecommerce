@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Cohere" Version="1.0.0" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="3.4.22" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
@@ -17,6 +19,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
+    <PackageReference Include="Mscc.GenerativeAI" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>

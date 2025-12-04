@@ -38,13 +38,21 @@
                             </select>
                         </div>
                         <div class="col-md-4 d-flex align-items-end gap-2">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn text-white" style="background-color: #FF9500; border: none;">
                                 <i class="fas fa-search me-1"></i>Tìm kiếm
                             </button>
-                            <a asp-action="Customers" class="btn btn-secondary">
-                                <i class="fas fa-redo me-1"></i>Làm mới
-                            </a>
                         </div>
+                        @if (!string.IsNullOrEmpty(ViewBag.SearchString) || !string.IsNullOrEmpty(ViewBag.Status))
+                        {
+                            <div class="col-12 mt-2">
+                                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='@Url.Action("Customers", "Admin")'" style="border-radius: 10px;">
+                                    <i class="fas fa-times-circle me-2"></i>Xóa bộ lọc
+                                </button>
+                                <small class="ms-3 text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>Đang áp dụng bộ lọc
+                                </small>
+                            </div>
+                        }
                     </form>
                 </div>
             </div>

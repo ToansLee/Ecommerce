@@ -13,7 +13,6 @@ namespace ECommerceMVC.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<Address> Addresses { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
@@ -49,7 +48,6 @@ namespace ECommerceMVC.Data
             {
                 eb.HasKey(e => e.Id);
                 eb.HasOne(o => o.Customer).WithMany(c => c.Orders).HasForeignKey(o => o.CustomerId).OnDelete(DeleteBehavior.Restrict);
-                eb.HasOne(o => o.Address).WithMany().HasForeignKey(o => o.AddressId).OnDelete(DeleteBehavior.SetNull);
                 eb.HasOne(o => o.Payment).WithOne(p => p.Order).HasForeignKey<Payment>(p => p.OrderId).OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -59,14 +57,6 @@ namespace ECommerceMVC.Data
                 eb.HasKey(e => e.Id);
                 eb.HasOne(oi => oi.Order).WithMany(o => o.Items).HasForeignKey(oi => oi.OrderId).OnDelete(DeleteBehavior.Cascade);
                 eb.HasOne(oi => oi.MenuItem).WithMany(mi => mi.OrderItems).HasForeignKey(oi => oi.MenuItemId).OnDelete(DeleteBehavior.Restrict);
-            });
-
-            // Address
-            modelBuilder.Entity<Address>(eb =>
-            {
-                eb.HasKey(e => e.Id);
-                eb.Property(e => e.Line).HasMaxLength(200).IsRequired();
-                eb.HasOne(a => a.Customer).WithMany(c => c.Addresses).HasForeignKey(a => a.CustomerId).OnDelete(DeleteBehavior.Cascade);
             });
 
             // ChatMessage

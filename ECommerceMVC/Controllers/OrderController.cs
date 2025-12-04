@@ -50,5 +50,42 @@ namespace ECommerceMVC.Controllers
 
             return View(order);
         }
+
+        // Xuất hóa đơn PDF
+        public async Task<IActionResult> ExportInvoice(int id)
+        {
+            var customerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+            var order = await db.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.Items)
+                    .ThenInclude(oi => oi.MenuItem)
+                .FirstOrDefaultAsync(o => o.Id == id && o.CustomerId == customerId);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // Không cho phép xuất hóa đơn cho đơn hàng bị hủy
+            if (order.Status == "Cancelled")
+            {
+                TempData["ErrorMessage"] = "Không thể xuất hóa đơn cho đơn hàng đã bị hủy!";
+                return RedirectToAction("Details", new { id });
+            }
+
+            try
+            {
+                byte[] pdfBytes = Services.InvoiceService.GenerateInvoice(order);
+                string fileName = $"HoaDon_{order.Id}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+                
+                return File(pdfBytes, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi xuất hóa đơn: {ex.Message}";
+                return RedirectToAction("Details", new { id });
+            }
+        }
     }
 }
