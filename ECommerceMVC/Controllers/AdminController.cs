@@ -12,10 +12,12 @@ namespace ECommerceMVC.Controllers
 	public class AdminController : Controller
 	{
 		private readonly FoodOrderingContext db;
+		private readonly CustomerTierService _tierService;
 
-		public AdminController(FoodOrderingContext context)
+		public AdminController(FoodOrderingContext context, CustomerTierService tierService)
 		{
 			db = context;
+			_tierService = tierService;
 		}
 
 	// Dashboard
@@ -25,7 +27,7 @@ namespace ECommerceMVC.Controllers
 		var totalMenuItems = await db.MenuItems.CountAsync();
 		var totalOrders = await db.Orders.CountAsync();
 		var totalRevenue = await db.Orders
-			.Where(o => o.Status == "Delivered")
+			.Where(o => o.Status == "Hoàn thành")
 			.SumAsync(o => (double?)o.TotalAmount) ?? 0;
 		var totalCustomers = await db.Customers.CountAsync(c => c.Role == "Customer");
 
@@ -366,17 +368,15 @@ namespace ECommerceMVC.Controllers
 				allOrders = allOrders.Where(o => o.CreatedAt.Date <= toDate.Value.Date);
 			}
 
-			ViewBag.TotalOrders = totalOrders;
-			ViewBag.PendingOrders = await allOrders.CountAsync(o => o.Status == "Pending");
-			ViewBag.PreparingOrders = await allOrders.CountAsync(o => o.Status == "Preparing");
-			ViewBag.DeliveringOrders = await allOrders.CountAsync(o => o.Status == "Delivering");
-			ViewBag.DeliveredOrders = await allOrders.CountAsync(o => o.Status == "Delivered");
-			ViewBag.CancelledOrders = await allOrders.CountAsync(o => o.Status == "Cancelled");
-			ViewBag.TotalRevenue = await allOrders
-				.Where(o => o.Status == "Delivered")
-				.SumAsync(o => (double?)o.TotalAmount) ?? 0;
-
-			// Pagination data
+		ViewBag.TotalOrders = totalOrders;
+		ViewBag.PendingOrders = await allOrders.CountAsync(o => o.Status == "Chờ xác nhận");
+		ViewBag.PreparingOrders = await allOrders.CountAsync(o => o.Status == "Chuẩn bị món");
+		ViewBag.DeliveringOrders = await allOrders.CountAsync(o => o.Status == "Đang giao");
+		ViewBag.DeliveredOrders = await allOrders.CountAsync(o => o.Status == "Hoàn thành");
+		ViewBag.CancelledOrders = await allOrders.CountAsync(o => o.Status == "Huỷ đơn");
+		ViewBag.TotalRevenue = await allOrders
+			.Where(o => o.Status == "Hoàn thành")
+			.SumAsync(o => (double?)o.TotalAmount) ?? 0;			// Pagination data
 			ViewBag.CurrentPage = page;
 			ViewBag.TotalPages = totalPages;
 			ViewBag.Search = search;
@@ -406,30 +406,35 @@ namespace ECommerceMVC.Controllers
 			return View(order);
 		}
 
-		// Cập nhật trạng thái đơn hàng
-		[HttpPost]
-		public async Task<IActionResult> UpdateOrderStatus(int id, string status)
+	// Cập nhật trạng thái đơn hàng
+	[HttpPost]
+	public async Task<IActionResult> UpdateOrderStatus(int id, string status)
+	{
+		var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+
+		if (order == null)
 		{
-			var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
-
-			if (order == null)
-			{
-				return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
-			}
-
-			order.Status = status;
-			await db.SaveChangesAsync();
-
-			return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
+			return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
 		}
 
-		// Xuất hóa đơn PDF
+		order.Status = status;
+		await db.SaveChangesAsync();
+
+		// Cập nhật hạng thành viên khi đơn hàng hoàn thành
+		if (status == "Hoàn thành")
+		{
+			await _tierService.UpdateCustomerTier(order.CustomerId);
+		}
+
+		return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
+	}		// Xuất hóa đơn PDF
 		public async Task<IActionResult> ExportInvoice(int id)
 		{
 			var order = await db.Orders
 				.Include(o => o.Customer)
 				.Include(o => o.Items)
 					.ThenInclude(oi => oi.MenuItem)
+				.Include(o => o.Payment)
 				.FirstOrDefaultAsync(o => o.Id == id);
 
 			if (order == null)
@@ -438,7 +443,7 @@ namespace ECommerceMVC.Controllers
 			}
 
 			// Không cho phép xuất hóa đơn cho đơn hàng bị hủy
-			if (order.Status == "Cancelled")
+			if (order.Status == "Huỷ đơn")
 			{
 				TempData["ErrorMessage"] = "Không thể xuất hóa đơn cho đơn hàng đã bị hủy!";
 				return RedirectToAction("OrderDetails", new { id });
@@ -462,31 +467,68 @@ namespace ECommerceMVC.Controllers
 		[HttpPost]
 		public async Task<IActionResult> CancelOrder(int id, string? reason)
 		{
-			var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+			var order = await db.Orders
+				.Include(o => o.Payment)
+				.Include(o => o.Customer)
+				.FirstOrDefaultAsync(o => o.Id == id);
 
 			if (order == null)
 			{
 				return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
 			}
 
-			if (order.Status == "Delivered")
+			if (order.Status == "Hoàn thành")
 			{
 				return Json(new { success = false, message = "Không thể hủy đơn hàng đã hoàn thành" });
 			}
 
-			if (order.Status == "Cancelled")
+			if (order.Status == "Huỷ đơn")
 			{
 				return Json(new { success = false, message = "Đơn hàng đã bị hủy trước đó" });
 			}
 
-			order.Status = "Cancelled";
+			// Hoàn tiền vào ví nếu đã thanh toán VNPay
+			if (order.Payment != null && order.Payment.Method == "VNPay" && order.Payment.Status == "Completed" && order.Customer != null)
+			{
+				order.Customer.WalletBalance += order.Payment.Amount;
+				
+				var refundTransaction = new WalletTransaction
+				{
+					CustomerId = order.CustomerId,
+					Amount = order.Payment.Amount,
+					Type = "Hoàn tiền",
+					Description = $"Hoàn tiền đơn hàng #{order.Id} bị hủy",
+					OrderId = order.Id
+				};
+				db.WalletTransactions.Add(refundTransaction);
+			}
+
+			// Hoàn tiền từ ví đã sử dụng
+			var walletPayment = await db.WalletTransactions
+				.FirstOrDefaultAsync(w => w.OrderId == id && w.Type == "Thanh toán");
+			if (walletPayment != null && order.Customer != null)
+			{
+				order.Customer.WalletBalance += Math.Abs(walletPayment.Amount);
+				
+				var refundTransaction = new WalletTransaction
+				{
+					CustomerId = order.CustomerId,
+					Amount = Math.Abs(walletPayment.Amount),
+					Type = "Hoàn tiền",
+					Description = $"Hoàn tiền ví từ đơn hàng #{order.Id} bị hủy",
+					OrderId = order.Id
+				};
+				db.WalletTransactions.Add(refundTransaction);
+			}
+
+			order.Status = "Huỷ đơn";
 			if (!string.IsNullOrEmpty(reason))
 			{
 				order.Notes = (order.Notes ?? "") + "\n[Lý do hủy: " + reason + "]";
 			}
 			await db.SaveChangesAsync();
 
-			return Json(new { success = true, message = "Đã hủy đơn hàng thành công" });
+			return Json(new { success = true, message = "Đã hủy đơn hàng và hoàn tiền thành công" });
 		}
 
 		// Xóa đơn hàng (chỉ cho admin)
@@ -503,13 +545,11 @@ namespace ECommerceMVC.Controllers
 				return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
 			}
 
-			// Chỉ cho phép xóa đơn hàng đã hủy hoặc đã hoàn thành lâu
-			if (order.Status != "Cancelled" && (order.Status != "Delivered" || order.CreatedAt > DateTime.UtcNow.AddDays(-30)))
-			{
-				return Json(new { success = false, message = "Chỉ có thể xóa đơn hàng đã hủy hoặc đơn hàng đã hoàn thành hơn 30 ngày" });
-			}
-
-			db.Orders.Remove(order);
+		// Chỉ cho phép xóa đơn hàng đã hủy hoặc đã hoàn thành lâu
+		if (order.Status != "Huỷ đơn" && (order.Status != "Hoàn thành" || order.CreatedAt > DateTime.UtcNow.AddDays(-30)))
+		{
+			return Json(new { success = false, message = "Chỉ có thể xóa đơn hàng đã hủy hoặc đơn hàng đã hoàn thành hơn 30 ngày" });
+		}			db.Orders.Remove(order);
 			await db.SaveChangesAsync();
 
 			return Json(new { success = true, message = "Đã xóa đơn hàng thành công" });
@@ -737,10 +777,10 @@ namespace ECommerceMVC.Controllers
 
 			// Thống kê đơn hàng
 			var totalOrders = await db.Orders.CountAsync(o => o.CustomerId == id);
-			var completedOrders = await db.Orders.CountAsync(o => o.CustomerId == id && o.Status == "Delivered");
+			var completedOrders = await db.Orders.CountAsync(o => o.CustomerId == id && o.Status == "Hoàn thành");
 			var cancelledOrders = await db.Orders.CountAsync(o => o.CustomerId == id && o.Status == "Cancelled");
 			var totalSpent = await db.Orders
-				.Where(o => o.CustomerId == id && o.Status == "Delivered")
+				.Where(o => o.CustomerId == id && o.Status == "Hoàn thành")
 				.SumAsync(o => (double?)o.TotalAmount) ?? 0;
 
 			ViewBag.TotalOrders = totalOrders;
@@ -832,12 +872,12 @@ namespace ECommerceMVC.Controllers
 		var today = vietnamNow.Date;
 
 		var totalRevenue = await db.Orders
-			.Where(o => o.Status == "Delivered")
+			.Where(o => o.Status == "Hoàn thành")
 			.SumAsync(o => (double?)o.TotalAmount) ?? 0;
 
 		// Lấy đơn hàng và chuyển sang giờ VN để so sánh
 		var allDeliveredOrders = await db.Orders
-			.Where(o => o.Status == "Delivered")
+			.Where(o => o.Status == "Hoàn thành")
 			.Select(o => new { o.TotalAmount, o.CreatedAt })
 			.ToListAsync();
 
@@ -880,7 +920,7 @@ namespace ECommerceMVC.Controllers
 
 		// Lấy tất cả đơn hàng đã giao trong tháng
 		var orders = await db.Orders
-			.Where(o => o.Status == "Delivered")
+			.Where(o => o.Status == "Hoàn thành")
 			.Select(o => new { o.TotalAmount, o.CreatedAt })
 			.ToListAsync();
 
@@ -924,7 +964,7 @@ namespace ECommerceMVC.Controllers
 
 		// Lấy tất cả đơn hàng đã giao
 		var orders = await db.Orders
-			.Where(o => o.Status == "Delivered")
+			.Where(o => o.Status == "Hoàn thành")
 			.Select(o => new { o.TotalAmount, o.CreatedAt })
 			.ToListAsync();
 
@@ -966,7 +1006,7 @@ namespace ECommerceMVC.Controllers
 			var topProducts = await db.OrderItems
 				.Include(oi => oi.MenuItem)
 				.Include(oi => oi.Order)
-				.Where(oi => oi.Order != null && oi.Order.Status == "Delivered" && oi.MenuItem != null)
+				.Where(oi => oi.Order != null && oi.Order.Status == "Hoàn thành" && oi.MenuItem != null)
 				.GroupBy(oi => new { oi.MenuItemId, oi.MenuItem!.Name })
 				.Select(g => new
 				{
@@ -989,7 +1029,7 @@ namespace ECommerceMVC.Controllers
 				.Include(oi => oi.MenuItem)
 				.ThenInclude(mi => mi!.Category)
 				.Include(oi => oi.Order)
-				.Where(oi => oi.Order != null && oi.Order.Status == "Delivered" && oi.MenuItem != null && oi.MenuItem.Category != null)
+				.Where(oi => oi.Order != null && oi.Order.Status == "Hoàn thành" && oi.MenuItem != null && oi.MenuItem.Category != null)
 				.GroupBy(oi => oi.MenuItem!.Category!.Name)
 				.Select(g => new
 				{
@@ -1009,7 +1049,7 @@ namespace ECommerceMVC.Controllers
 		{
 			var topCustomers = await db.Orders
 				.Include(o => o.Customer)
-				.Where(o => o.Status == "Delivered" && o.Customer != null)
+				.Where(o => o.Status == "Hoàn thành" && o.Customer != null)
 				.GroupBy(o => new { o.CustomerId, o.Customer!.FullName, o.Customer.Email })
 				.Select(g => new
 				{

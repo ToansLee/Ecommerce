@@ -16,6 +16,7 @@ namespace ECommerceMVC.Data
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<WalletTransaction> WalletTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,6 +66,14 @@ namespace ECommerceMVC.Data
                 eb.HasKey(e => e.Id);
                 eb.HasOne(c => c.Sender).WithMany().HasForeignKey(c => c.SenderId).OnDelete(DeleteBehavior.Restrict);
                 eb.HasOne(c => c.Receiver).WithMany().HasForeignKey(c => c.ReceiverId).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // WalletTransaction
+            modelBuilder.Entity<WalletTransaction>(eb =>
+            {
+                eb.HasKey(e => e.Id);
+                eb.HasOne(w => w.Customer).WithMany(c => c.WalletTransactions).HasForeignKey(w => w.CustomerId).OnDelete(DeleteBehavior.Restrict);
+                eb.HasOne(w => w.Order).WithMany().HasForeignKey(w => w.OrderId).OnDelete(DeleteBehavior.SetNull);
             });
 
             base.OnModelCreating(modelBuilder);

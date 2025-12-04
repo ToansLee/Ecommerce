@@ -18,7 +18,8 @@ namespace ECommerceMVC.Models
         public string Method { get; set; } = "VNPay";
         
         [Required]
-        public double Amount { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; }
         
         [Required]
         [MaxLength(20)]
@@ -27,7 +28,7 @@ namespace ECommerceMVC.Models
         [MaxLength(100)]
         public string? TransactionId { get; set; }
         
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
         public DateTime? CompletedAt { get; set; }
     }
 }

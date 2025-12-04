@@ -38,10 +38,23 @@ namespace ECommerceMVC.Models
         [MaxLength(20)]
         public string Role { get; set; } = "Customer";
         
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
         public bool IsActive { get; set; } = true;
+        
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal WalletBalance { get; set; } = 0;
+        
+        // Customer Tier System
+        [MaxLength(20)]
+        public string CustomerTier { get; set; } = "Bạc"; // Bạc, Vàng, Kim cương
+        
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal MonthlySpending { get; set; } = 0;
+        
+        public DateTime LastTierUpdate { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
         
         // Relationships
         public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<WalletTransaction> WalletTransactions { get; set; } = new List<WalletTransaction>();
     }
 }

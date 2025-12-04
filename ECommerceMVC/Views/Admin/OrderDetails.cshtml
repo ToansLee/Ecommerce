@@ -2,22 +2,13 @@
 @{
     ViewData["Title"] = "Chi tiết đơn hàng";
     Layout = "_LayoutAdmin";
-    var statusText = Model.Status switch
-    {
-        "Pending" => "Chờ xác nhận",
-        "Preparing" => "Chuẩn bị món",
-        "Delivering" => "Đang giao",
-        "Delivered" => "Hoàn thành",
-        "Cancelled" => "Đã hủy",
-        _ => Model.Status
-    };
 }
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="color: #FF9500;"><i class="fas fa-receipt me-2"></i>Chi tiết đơn hàng #@Model.Id</h2>
         <div>
-            @if (Model.Status != "Cancelled")
+            @if (Model.Status != "Huỷ đơn")
             {
                 <a asp-action="ExportInvoice" asp-route-id="@Model.Id" class="btn btn-success me-2" style="border-radius: 8px;">
                     <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn PDF
@@ -122,46 +113,46 @@
                             @{
                                 var statusBadge = Model.Status switch
                                 {
-                                    "Pending" => "bg-warning",
-                                    "Preparing" => "bg-info",
-                                    "Delivering" => "bg-primary",
-                                    "Delivered" => "bg-success",
-                                    "Cancelled" => "bg-danger",
+                                    "Chờ xác nhận" => "bg-warning",
+                                    "Chuẩn bị món" => "bg-info",
+                                    "Đang giao" => "bg-primary",
+                                    "Hoàn thành" => "bg-success",
+                                    "Huỷ đơn" => "bg-danger",
                                     _ => "bg-secondary"
                                 };
                             }
-                            <span class="badge @statusBadge fs-6">@statusText</span>
+                            <span class="badge @statusBadge fs-6">@Model.Status</span>
                         </div>
                     </div>
 
                     <hr>
 
                     <div class="d-grid gap-2">
-                        @if (Model.Status == "Pending")
+                        @if (Model.Status == "Chờ xác nhận")
                         {
-                            <button class="btn text-white" style="background-color: #17a2b8;" onclick="updateStatus(@Model.Id, 'Preparing')">
+                            <button class="btn text-white" style="background-color: #17a2b8;" onclick="updateStatus(@Model.Id, 'Chuẩn bị món')">
                                 <i class="fas fa-utensils me-2"></i>Xác nhận & Chuẩn bị món
                             </button>
                         }
-                        @if (Model.Status == "Preparing")
+                        @if (Model.Status == "Chuẩn bị món")
                         {
-                            <button class="btn text-white" style="background-color: #007bff;" onclick="updateStatus(@Model.Id, 'Delivering')">
+                            <button class="btn text-white" style="background-color: #007bff;" onclick="updateStatus(@Model.Id, 'Đang giao')">
                                 <i class="fas fa-shipping-fast me-2"></i>Bắt đầu giao hàng
                             </button>
                         }
-                        @if (Model.Status == "Delivering")
+                        @if (Model.Status == "Đang giao")
                         {
-                            <button class="btn btn-success" onclick="updateStatus(@Model.Id, 'Delivered')">
+                            <button class="btn btn-success" onclick="updateStatus(@Model.Id, 'Hoàn thành')">
                                 <i class="fas fa-check-circle me-2"></i>Hoàn thành đơn hàng
                             </button>
                         }
-                        @if (Model.Status != "Delivered" && Model.Status != "Cancelled")
+                        @if (Model.Status != "Hoàn thành" && Model.Status != "Huỷ đơn")
                         {
                             <button class="btn btn-danger" onclick="showCancelModal(@Model.Id)">
                                 <i class="fas fa-times-circle me-2"></i>Hủy đơn hàng
                             </button>
                         }
-                        @if (Model.Status == "Cancelled" || (Model.Status == "Delivered" && Model.CreatedAt <= DateTime.UtcNow.AddDays(-30)))
+                        @if (Model.Status == "Huỷ đơn" || (Model.Status == "Hoàn thành" && Model.CreatedAt <= DateTime.UtcNow.AddDays(-30)))
                         {
                             <button class="btn btn-outline-danger" onclick="deleteOrder(@Model.Id)">
                                 <i class="fas fa-trash me-2"></i>Xóa đơn hàng
@@ -199,13 +190,7 @@
         var currentOrderId = 0;
 
         function updateStatus(orderId, status) {
-            var statusText = {
-                'Preparing': 'Chuẩn bị món',
-                'Delivering': 'Đang giao',
-                'Delivered': 'Hoàn thành'
-            };
-
-            if (confirm('Bạn có chắc muốn cập nhật trạng thái thành "' + statusText[status] + '"?')) {
+            if (confirm('Bạn có chắc muốn cập nhật trạng thái thành "' + status + '"?')) {
                 $.ajax({
                     url: '@Url.Action("UpdateOrderStatus", "Admin")',
                     type: 'POST',
@@ -235,9 +220,9 @@
             var reason = document.getElementById('cancelReason').value;
             
             $.ajax({
-                url: '@Url.Action("CancelOrder", "Admin")',
+                url: '@Url.Action("UpdateOrderStatus", "Admin")',
                 type: 'POST',
-                data: { id: currentOrderId, reason: reason },
+                data: { id: currentOrderId, status: 'Huỷ đơn' },
                 success: function(response) {
                     if (response.success) {
                         alert(response.message);

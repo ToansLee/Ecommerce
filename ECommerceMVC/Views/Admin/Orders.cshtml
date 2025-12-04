@@ -86,11 +86,11 @@
                         <label class="form-label"><i class="fas fa-filter me-1"></i>Trạng thái</label>
                         <select name="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
                             <option value="">Tất cả</option>
-                            <option value="Pending" selected="@(ViewBag.Status == "Pending" ? "selected" : null)">Chờ xác nhận</option>
-                            <option value="Preparing" selected="@(ViewBag.Status == "Preparing" ? "selected" : null)">Chuẩn bị món</option>
-                            <option value="Delivering" selected="@(ViewBag.Status == "Delivering" ? "selected" : null)">Đang giao</option>
-                            <option value="Delivered" selected="@(ViewBag.Status == "Delivered" ? "selected" : null)">Hoàn thành</option>
-                            <option value="Cancelled" selected="@(ViewBag.Status == "Cancelled" ? "selected" : null)">Đã hủy</option>
+                            <option value="Chờ xác nhận" selected="@(ViewBag.Status == "Chờ xác nhận" ? "selected" : null)">Chờ xác nhận</option>
+                            <option value="Chuẩn bị món" selected="@(ViewBag.Status == "Chuẩn bị món" ? "selected" : null)">Chuẩn bị món</option>
+                            <option value="Đang giao" selected="@(ViewBag.Status == "Đang giao" ? "selected" : null)">Đang giao</option>
+                            <option value="Hoàn thành" selected="@(ViewBag.Status == "Hoàn thành" ? "selected" : null)">Hoàn thành</option>
+                            <option value="Huỷ đơn" selected="@(ViewBag.Status == "Huỷ đơn" ? "selected" : null)">Huỷ đơn</option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -174,24 +174,15 @@
                                 @{
                                     var statusBadge = order.Status switch
                                     {
-                                        "Pending" => "bg-warning",
-                                        "Preparing" => "bg-info",
-                                        "Delivering" => "bg-primary",
-                                        "Delivered" => "bg-success",
-                                        "Cancelled" => "bg-danger",
+                                        "Chờ xác nhận" => "bg-warning",
+                                        "Chuẩn bị món" => "bg-info",
+                                        "Đang giao" => "bg-primary",
+                                        "Hoàn thành" => "bg-success",
+                                        "Huỷ đơn" => "bg-danger",
                                         _ => "bg-secondary"
                                     };
-                                    var statusText = order.Status switch
-                                    {
-                                        "Pending" => "Chờ xác nhận",
-                                        "Preparing" => "Chuẩn bị món",
-                                        "Delivering" => "Đang giao",
-                                        "Delivered" => "Hoàn thành",
-                                        "Cancelled" => "Đã hủy",
-                                        _ => order.Status
-                                    };
                                 }
-                                <span class="badge @statusBadge">@statusText</span>
+                                <span class="badge @statusBadge">@order.Status</span>
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
@@ -204,25 +195,25 @@
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
                                     }
-                                    @if (order.Status == "Pending")
+                                    @if (order.Status == "Chờ xác nhận")
                                     {
-                                        <button class="btn btn-sm btn-info text-white" onclick="quickUpdateStatus(@order.Id, 'Preparing')" title="Chuẩn bị món">
+                                        <button class="btn btn-sm btn-info text-white" onclick="quickUpdateStatus(@order.Id, 'Chuẩn bị món')" title="Chuẩn bị món">
                                             <i class="fas fa-utensils"></i>
                                         </button>
                                     }
-                                    @if (order.Status == "Preparing")
+                                    @if (order.Status == "Chuẩn bị món")
                                     {
-                                        <button class="btn btn-sm btn-primary" onclick="quickUpdateStatus(@order.Id, 'Delivering')" title="Giao hàng">
+                                        <button class="btn btn-sm btn-primary" onclick="quickUpdateStatus(@order.Id, 'Đang giao')" title="Giao hàng">
                                             <i class="fas fa-shipping-fast"></i>
                                         </button>
                                     }
-                                    @if (order.Status == "Delivering")
+                                    @if (order.Status == "Đang giao")
                                     {
-                                        <button class="btn btn-sm btn-success" onclick="quickUpdateStatus(@order.Id, 'Delivered')" title="Hoàn thành">
+                                        <button class="btn btn-sm btn-success" onclick="quickUpdateStatus(@order.Id, 'Hoàn thành')" title="Hoàn thành">
                                             <i class="fas fa-check"></i>
                                         </button>
                                     }
-                                    @if (order.Status == "Cancelled" || (order.Status == "Delivered" && order.CreatedAt <= DateTime.UtcNow.AddDays(-30)))
+                                    @if (order.Status == "Huỷ đơn" || (order.Status == "Hoàn thành" && order.CreatedAt <= DateTime.UtcNow.AddDays(-30)))
                                     {
                                         <button class="btn btn-sm btn-outline-danger" onclick="deleteOrderQuick(@order.Id)" title="Xóa đơn">
                                             <i class="fas fa-trash"></i>
@@ -240,100 +231,59 @@
         @if (ViewBag.TotalPages > 1)
         {
             <nav aria-label="Page navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <!-- Previous Button -->
-                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" 
-                           asp-action="Orders" 
-                           asp-route-page="@(ViewBag.CurrentPage - 1)"
-                           asp-route-search="@ViewBag.Search"
-                           asp-route-status="@ViewBag.Status"
-                           asp-route-fromDate="@ViewBag.FromDate"
-                           asp-route-toDate="@ViewBag.ToDate"
-                           asp-route-sortBy="@ViewBag.SortBy"
-                           style="color: #FF9500; border-color: #FFE5CC;">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    </li>
-
+                <div class="d-flex justify-content-center gap-2">
                     @{
                         int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
                         int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
                     }
 
-                    @if (startPage > 1)
+                    @* Nút về trang đầu *@
+                    @if (ViewBag.CurrentPage > 1)
                     {
-                        <li class="page-item">
-                            <a class="page-link" 
-                               asp-action="Orders" 
-                               asp-route-page="1"
-                               asp-route-search="@ViewBag.Search"
-                               asp-route-status="@ViewBag.Status"
-                               asp-route-fromDate="@ViewBag.FromDate"
-                               asp-route-toDate="@ViewBag.ToDate"
-                               asp-route-sortBy="@ViewBag.SortBy"
-                               style="color: #FF9500; border-color: #FFE5CC;">1</a>
-                        </li>
-                        @if (startPage > 2)
-                        {
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
-                        }
-                    }
-
-                    @for (int i = startPage; i <= endPage; i++)
-                    {
-                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                            <a class="page-link" 
-                               asp-action="Orders" 
-                               asp-route-page="@i"
-                               asp-route-search="@ViewBag.Search"
-                               asp-route-status="@ViewBag.Status"
-                               asp-route-fromDate="@ViewBag.FromDate"
-                               asp-route-toDate="@ViewBag.ToDate"
-                               asp-route-sortBy="@ViewBag.SortBy"
-                               style="@(i == ViewBag.CurrentPage ? "background-color: #FF9500; border-color: #FF9500; color: white;" : "color: #FF9500; border-color: #FFE5CC;")">
-                                @i
-                            </a>
-                        </li>
-                    }
-
-                    @if (endPage < ViewBag.TotalPages)
-                    {
-                        @if (endPage < ViewBag.TotalPages - 1)
-                        {
-                            <li class="page-item disabled"><span class="page-link">...</span></li>
-                        }
-                        <li class="page-item">
-                            <a class="page-link" 
-                               asp-action="Orders" 
-                               asp-route-page="@ViewBag.TotalPages"
-                               asp-route-search="@ViewBag.Search"
-                               asp-route-status="@ViewBag.Status"
-                               asp-route-fromDate="@ViewBag.FromDate"
-                               asp-route-toDate="@ViewBag.ToDate"
-                               asp-route-sortBy="@ViewBag.SortBy"
-                               style="color: #FF9500; border-color: #FFE5CC;">@ViewBag.TotalPages</a>
-                        </li>
-                    }
-
-                    <!-- Next Button -->
-                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
-                        <a class="page-link" 
-                           asp-action="Orders" 
-                           asp-route-page="@(ViewBag.CurrentPage + 1)"
+                        <a asp-action="Orders" 
+                           asp-route-page="1"
                            asp-route-search="@ViewBag.Search"
                            asp-route-status="@ViewBag.Status"
                            asp-route-fromDate="@ViewBag.FromDate"
                            asp-route-toDate="@ViewBag.ToDate"
                            asp-route-sortBy="@ViewBag.SortBy"
-                           style="color: #FF9500; border-color: #FFE5CC;">
-                            <i class="fas fa-chevron-right"></i>
+                           class="btn btn-outline-secondary"
+                           style="min-width: 45px; border-radius: 8px;">
+                            «
                         </a>
-                    </li>
-                </ul>
-                <p class="text-center text-muted mt-3">
-                    Trang @ViewBag.CurrentPage / @ViewBag.TotalPages (Tổng @ViewBag.TotalOrders đơn hàng)
-                </p>
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <a asp-action="Orders" 
+                           asp-route-page="@i"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-status="@ViewBag.Status"
+                           asp-route-fromDate="@ViewBag.FromDate"
+                           asp-route-toDate="@ViewBag.ToDate"
+                           asp-route-sortBy="@ViewBag.SortBy"
+                           class="btn @(i == ViewBag.CurrentPage ? "btn-success" : "btn-outline-secondary")"
+                           style="min-width: 45px; border-radius: 8px;">
+                            @i
+                        </a>
+                    }
+
+                    @if (endPage < ViewBag.TotalPages)
+                    {
+                        <span class="btn btn-outline-secondary" style="min-width: 45px; border-radius: 8px; pointer-events: none;">…</span>
+                        <a asp-action="Orders" 
+                           asp-route-page="@ViewBag.TotalPages"
+                           asp-route-search="@ViewBag.Search"
+                           asp-route-status="@ViewBag.Status"
+                           asp-route-fromDate="@ViewBag.FromDate"
+                           asp-route-toDate="@ViewBag.ToDate"
+                           asp-route-sortBy="@ViewBag.SortBy"
+                           class="btn btn-outline-secondary"
+                           style="min-width: 45px; border-radius: 8px;">
+                            »
+                        </a>
+                    }
+                </div>
             </nav>
         }
     }
@@ -342,13 +292,7 @@
 @section Scripts {
     <script>
         function quickUpdateStatus(orderId, status) {
-            var statusText = {
-                'Preparing': 'Chuẩn bị món',
-                'Delivering': 'Đang giao',
-                'Delivered': 'Hoàn thành'
-            };
-
-            if (confirm('Cập nhật trạng thái thành "' + statusText[status] + '"?')) {
+            if (confirm('Cập nhật trạng thái thành "' + status + '"?')) {
                 $.ajax({
                     url: '@Url.Action("UpdateOrderStatus", "Admin")',
                     type: 'POST',

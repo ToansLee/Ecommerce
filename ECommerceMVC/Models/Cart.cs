@@ -13,8 +13,8 @@ namespace ECommerceMVC.Models
 		[MaxLength(100)]
 		public string? SessionId { get; set; } // For guests (not logged in)
 
-		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-		public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+		public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+		public DateTime UpdatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
 
 		[ForeignKey("CustomerId")]
 		public Customer? Customer { get; set; }

@@ -12,11 +12,10 @@ namespace ECommerceMVC.Models
 
 		public int MenuItemId { get; set; }
 
-		public int Quantity { get; set; }
+	public int Quantity { get; set; }
 
-		public double Price { get; set; } // Store price at the time of adding to cart
-
-		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+	[Column(TypeName = "decimal(18,2)")]
+	public decimal Price { get; set; } // Store price at the time of adding to cart		public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
 
 		[ForeignKey("CartId")]
 		public Cart Cart { get; set; } = null!;

@@ -13,14 +13,15 @@ namespace ECommerceMVC.Models
         public int CustomerId { get; set; }
         public Customer? Customer { get; set; }
         
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
         
         [Required]
-        public double TotalAmount { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalAmount { get; set; }
         
         [Required]
-        [MaxLength(20)]
-        public string Status { get; set; } = "Pending";
+        [MaxLength(50)]
+        public string Status { get; set; } = "Chờ xác nhận";
         
         public Payment? Payment { get; set; }
         

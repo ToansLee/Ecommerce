@@ -76,7 +76,7 @@ namespace ECommerceMVC.Controllers
 			{
 				MaHh = ci.MenuItemId,
 				TenHH = ci.MenuItem.Name,
-				DonGia = ci.Price,
+				DonGia = (double)ci.Price,
 				Hinh = ci.MenuItem.Image ?? "",
 				SoLuong = ci.Quantity
 			}).ToList();
@@ -96,18 +96,16 @@ namespace ECommerceMVC.Controllers
 				return RedirectToAction("Index", "Seller");
 			}
 
-			var menuItem = db.MenuItems.SingleOrDefault(p => p.Id == id);
-			if (menuItem == null)
+		var menuItem = db.MenuItems.SingleOrDefault(p => p.Id == id);
+		if (menuItem == null || !menuItem.IsAvailable)
+		{
+			if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
 			{
-				if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-				{
-					return Json(new { success = false, message = $"Không tìm thấy sản phẩm có mã {id}" });
-				}
-				TempData["Message"] = $"Không tìm thấy menu item có mã {id}";
-				return Redirect("/404");
+				return Json(new { success = false, message = "Sản phẩm không khả dụng hoặc đã hết hàng" });
 			}
-
-			var cart = GetOrCreateCart();
+			TempData["Message"] = "Sản phẩm không khả dụng hoặc đã hết hàng";
+			return Redirect("/404");
+		}			var cart = GetOrCreateCart();
 			var cartItem = cart.CartItems.FirstOrDefault(ci => ci.MenuItemId == id);
 
 			if (cartItem == null)

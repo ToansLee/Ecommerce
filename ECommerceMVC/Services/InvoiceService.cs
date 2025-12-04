@@ -133,7 +133,7 @@ namespace ECommerceMVC.Services
 
                 // Items
                 int index = 1;
-                double subtotal = 0;
+                decimal subtotal = 0;
                 foreach (var item in order.Items)
                 {
                     AddTableCell(itemsTable, index.ToString(), normalFont, Element.ALIGN_CENTER);
@@ -141,7 +141,7 @@ namespace ECommerceMVC.Services
                     AddTableCell(itemsTable, $"{item.UnitPrice:N0}đ", normalFont, Element.ALIGN_RIGHT);
                     AddTableCell(itemsTable, item.Quantity.ToString(), normalFont, Element.ALIGN_CENTER);
                     
-                    double itemTotal = item.Quantity * item.UnitPrice;
+                    decimal itemTotal = item.Quantity * item.UnitPrice;
                     subtotal += itemTotal;
                     AddTableCell(itemsTable, $"{itemTotal:N0}đ", normalFont, Element.ALIGN_RIGHT);
                     
@@ -157,15 +157,15 @@ namespace ECommerceMVC.Services
                 totalTable.SetWidths(new float[] { 3, 1 });
 
                 // Tính phí vận chuyển
-                double shippingFee = 35000;
+                decimal shippingFee = 35000;
                 if (subtotal >= 500000)
                 {
                     shippingFee = 0;
                 }
-                double productTotal = subtotal;
+                decimal productTotal = subtotal;
                 
-                AddTotalRow(totalTable, "Tạm tính:", $"{productTotal:N0}đ", normalFont, normalFont);
-                AddTotalRow(totalTable, "Phí vận chuyển:", $"{shippingFee:N0}đ", normalFont, normalFont);
+                AddTotalRow(totalTable, "Tạm tính:", $"{(double)productTotal:N0}đ", normalFont, normalFont);
+                AddTotalRow(totalTable, "Phí vận chuyển:", $"{(double)shippingFee:N0}đ", normalFont, normalFont);
                 Font totalPriceFont = new Font(baseFont, 14, Font.BOLD, new BaseColor(255, 149, 0));
                 AddTotalRow(totalTable, "TỔNG CỘNG:", $"{order.TotalAmount:N0}đ", boldFont, totalPriceFont);
 
@@ -182,7 +182,29 @@ namespace ECommerceMVC.Services
 
                 // Phương thức thanh toán
                 document.Add(new Paragraph(" "));
-                Paragraph paymentPara = new Paragraph("Phương thức thanh toán: Thanh toán khi nhận hàng (COD)", normalFont);
+                string paymentMethodText = "Thanh toán khi nhận hàng (COD)";
+                
+                if (order.Payment != null)
+                {
+                    if (order.Payment.Method == "VNPay")
+                    {
+                        paymentMethodText = $"Thanh toán qua VNPay - Đã thanh toán {order.Payment.Amount:N0}đ";
+                        if (!string.IsNullOrEmpty(order.Payment.TransactionId))
+                        {
+                            paymentMethodText += $"\nMã giao dịch: {order.Payment.TransactionId}";
+                        }
+                    }
+                    else if (order.Payment.Method == "Wallet")
+                    {
+                        paymentMethodText = "Đã thanh toán bằng ví điện tử";
+                    }
+                    else if (order.Payment.Method == "COD")
+                    {
+                        paymentMethodText = "Thanh toán khi nhận hàng (COD)";
+                    }
+                }
+                
+                Paragraph paymentPara = new Paragraph($"Phương thức thanh toán: {paymentMethodText}", normalFont);
                 document.Add(paymentPara);
 
                 // Footer

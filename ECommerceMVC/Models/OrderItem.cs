@@ -22,7 +22,8 @@ namespace ECommerceMVC.Models
         public int Quantity { get; set; } = 1;
         
         [Required]
-        public double UnitPrice { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal UnitPrice { get; set; }
         
         [MaxLength(200)]
         public string? Notes { get; set; }

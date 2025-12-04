@@ -22,7 +22,7 @@ namespace ECommerceMVC.Models
         [MaxLength(1000)]
         public string Message { get; set; } = null!;
 
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime SentAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
 
         public bool IsRead { get; set; } = false;
     }

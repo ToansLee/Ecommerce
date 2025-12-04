@@ -1,5 +1,6 @@
 using ECommerceMVC.Data;
 using ECommerceMVC.Models;
+using ECommerceMVC.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,14 @@ namespace ECommerceMVC.Controllers
     public class CheckoutController : Controller
     {
         private readonly FoodOrderingContext db;
+        private readonly VNPayService _vnPayService;
+        private readonly CustomerTierService _tierService;
 
-        public CheckoutController(FoodOrderingContext context)
+        public CheckoutController(FoodOrderingContext context, VNPayService vnPayService, CustomerTierService tierService)
         {
             db = context;
+            _vnPayService = vnPayService;
+            _tierService = tierService;
         }
 
         private Models.Cart GetCart()
@@ -35,11 +40,22 @@ namespace ECommerceMVC.Controllers
             return cart;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
                 var cart = GetCart();
+                var customerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+                var customer = db.Customers.Find(customerId);
+                
+                // Cập nhật hạng thành viên
+                await _tierService.UpdateCustomerTier(customerId);
+                customer = db.Customers.Find(customerId);
+                
+                ViewBag.WalletBalance = customer?.WalletBalance ?? 0;
+                ViewBag.CustomerTier = customer?.CustomerTier ?? "Bạc";
+                ViewBag.DiscountPercentage = (int)(_tierService.GetDiscountPercentage(customer?.CustomerTier ?? "Bạc") * 100);
+                
                 return View(cart);
             }
             catch (Exception ex)
@@ -50,7 +66,7 @@ namespace ECommerceMVC.Controllers
         }
 
         [HttpPost]
-        public IActionResult ProcessPayment(string? deliveryAddress, string? notes)
+        public IActionResult ProcessPayment(string? deliveryAddress, string? notes, string paymentMethod = "COD")
         {
             try
             {
@@ -62,20 +78,29 @@ namespace ECommerceMVC.Controllers
 
                 var cart = GetCart();
                 var customerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+                var customer = db.Customers.Find(customerId);
 
                 // Calculate totals
                 var orderTotal = cart.CartItems.Sum(ci => ci.Quantity * ci.Price);
                 var shippingFee = orderTotal >= 500000 ? 0 : 35000;
-                var totalAmount = orderTotal + shippingFee;
+                var subtotal = orderTotal + shippingFee;
+                
+                // Áp dụng giảm giá theo hạng thành viên
+                var tierDiscount = _tierService.CalculateDiscount(subtotal, customer?.CustomerTier ?? "Bạc");
+                var totalAmount = subtotal - tierDiscount;
+
+                // Ưu tiên sử dụng số dư ví
+                var walletUsed = Math.Min(customer?.WalletBalance ?? 0, totalAmount);
+                var remainingAmount = totalAmount - walletUsed;
 
                 // Create single order for all items
                 var order = new Order
                 {
                     CustomerId = customerId,
                     TotalAmount = totalAmount,
-                    Status = "Pending",
+                    Status = "Chờ xác nhận",
                     Notes = notes,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"))
                 };
 
                 db.Orders.Add(order);
@@ -94,30 +119,113 @@ namespace ECommerceMVC.Controllers
                     db.OrderItems.Add(orderItem);
                 }
 
-                // Create payment record (COD)
-                var payment = new Payment
+                // Trừ tiền từ ví nếu có
+                if (walletUsed > 0 && customer != null)
                 {
-                    OrderId = order.Id,
-                    Method = "COD",
-                    Amount = totalAmount,
-                    Status = "Pending",
-                    CreatedAt = DateTime.UtcNow
-                };
-                db.Payments.Add(payment);
+                    customer.WalletBalance -= walletUsed;
+                    var walletTransaction = new WalletTransaction
+                    {
+                        CustomerId = customerId,
+                        Amount = -walletUsed,
+                        Type = "Thanh toán",
+                        Description = $"Thanh toán đơn hàng #{order.Id}",
+                        OrderId = order.Id
+                    };
+                    db.WalletTransactions.Add(walletTransaction);
+                }
 
-                db.SaveChanges();
+                if (paymentMethod == "VNPay" && remainingAmount > 0)
+                {
+                    // Thanh toán VNPay cho số tiền còn lại
+                    var payment = new Payment
+                    {
+                        OrderId = order.Id,
+                        Method = "VNPay",
+                        Amount = remainingAmount,
+                        Status = "Pending",
+                        CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"))
+                    };
+                    db.Payments.Add(payment);
+                    db.SaveChanges();
 
-                // Clear cart
-                db.CartItems.RemoveRange(cart.CartItems);
-                db.SaveChanges();
+                    // Clear cart
+                    db.CartItems.RemoveRange(cart.CartItems);
+                    db.SaveChanges();
 
-                TempData["Success"] = "Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.";
-                return RedirectToAction("OrderSuccess", new { orderId = order.Id });
+                    // Tạo URL thanh toán VNPay
+                    var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+                    var paymentUrl = _vnPayService.CreatePaymentUrl(
+                        order.Id,
+                        remainingAmount,
+                        $"Thanh toán đơn hàng #{order.Id}",
+                        ipAddress
+                    );
+
+                    return Redirect(paymentUrl);
+                }
+                else
+                {
+                    // Thanh toán COD hoặc đã đủ tiền trong ví
+                    var payment = new Payment
+                    {
+                        OrderId = order.Id,
+                        Method = remainingAmount == 0 ? "Wallet" : "COD",
+                        Amount = remainingAmount,
+                        Status = remainingAmount == 0 ? "Completed" : "Pending",
+                        CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"))
+                    };
+                    db.Payments.Add(payment);
+                    db.SaveChanges();
+
+                    // Clear cart
+                    db.CartItems.RemoveRange(cart.CartItems);
+                    db.SaveChanges();
+
+                    TempData["Success"] = remainingAmount == 0 
+                        ? "Đặt hàng thành công! Đã thanh toán bằng ví." 
+                        : "Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng.";
+                    return RedirectToAction("OrderSuccess", new { orderId = order.Id });
+                }
             }
             catch (Exception ex)
             {
                 TempData["Error"] = ex.Message;
                 return RedirectToAction("Index");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult VNPayReturn()
+        {
+            try
+            {
+                var response = _vnPayService.ProcessPaymentResponse(Request.Query);
+
+                if (response.Success)
+                {
+                    var payment = db.Payments
+                        .Include(p => p.Order)
+                        .FirstOrDefault(p => p.OrderId == response.OrderId);
+
+                    if (payment != null)
+                    {
+                        payment.Status = "Completed";
+                        payment.TransactionId = response.TransactionId;
+                        payment.CompletedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                        db.SaveChanges();
+
+                        TempData["Success"] = "Thanh toán VNPay thành công!";
+                        return RedirectToAction("OrderSuccess", new { orderId = response.OrderId });
+                    }
+                }
+
+                TempData["Error"] = "Thanh toán VNPay thất bại!";
+                return RedirectToAction("Index", "Order");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index", "Order");
             }
         }
 

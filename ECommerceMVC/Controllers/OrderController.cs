@@ -60,6 +60,7 @@ namespace ECommerceMVC.Controllers
                 .Include(o => o.Customer)
                 .Include(o => o.Items)
                     .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.Payment)
                 .FirstOrDefaultAsync(o => o.Id == id && o.CustomerId == customerId);
 
             if (order == null)
@@ -68,7 +69,7 @@ namespace ECommerceMVC.Controllers
             }
 
             // Không cho phép xuất hóa đơn cho đơn hàng bị hủy
-            if (order.Status == "Cancelled")
+            if (order.Status == "Huỷ đơn")
             {
                 TempData["ErrorMessage"] = "Không thể xuất hóa đơn cho đơn hàng đã bị hủy!";
                 return RedirectToAction("Details", new { id });

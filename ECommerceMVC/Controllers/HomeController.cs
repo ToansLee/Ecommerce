@@ -25,12 +25,13 @@ namespace ECommerceMVC.Controllers
 		}			// Lấy tất cả sản phẩm để hỗ trợ filter theo category
 			var menuItems = _db.MenuItems
 				.Include(m => m.Category)
+				.Where(m => m.IsAvailable)
 				.OrderByDescending(m => m.CreatedAt)
 				.Select(p => new HangHoaVM
 				{
 					MaHh = p.Id,
 					TenHH = p.Name,
-					DonGia = p.Price,
+					DonGia = (double)p.Price,
 					Hinh = p.Image ?? "",
 					MoTaNgan = p.Description ?? "",
 					TenLoai = p.Category != null ? p.Category.Name : "",

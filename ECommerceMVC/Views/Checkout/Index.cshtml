@@ -51,9 +51,51 @@
                                 <textarea class="form-control" name="notes" rows="3" placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn." style="border: 2px solid #E0E0E0; border-radius: 10px; padding: 12px;"></textarea>
                             </div>
 
-                            <div class="alert alert-info" style="background-color: #E3F2FD; border: none; border-radius: 15px; border-left: 5px solid #2196F3;">
-                                <i class="fas fa-money-bill-wave me-2" style="color: #2196F3;"></i>
-                                <strong>Phương thức thanh toán:</strong> Thanh toán khi nhận hàng (COD)
+                            <!-- Hiển thị hạng thành viên -->
+                            <div class="alert" style="background: linear-gradient(135deg, #FFE5CC 0%, #FFD4A3 100%); border: none; border-radius: 15px; border-left: 5px solid #FF9500;">
+                                <i class="fas fa-crown me-2" style="color: #FF9500;"></i>
+                                <strong>Hạng thành viên:</strong> <span style="color: #FF9500; font-weight: 600;">@ViewBag.CustomerTier</span>
+                                <br>
+                                <small class="text-muted">Bạn được giảm @ViewBag.DiscountPercentage% cho đơn hàng này</small>
+                            </div>
+
+                            <!-- Hiển thị số dư ví -->
+                            @if (ViewBag.WalletBalance > 0)
+                            {
+                                <div class="alert alert-success" style="background-color: #E8F5E9; border: none; border-radius: 15px; border-left: 5px solid #4CAF50;">
+                                    <i class="fas fa-wallet me-2" style="color: #4CAF50;"></i>
+                                    <strong>Số dư ví:</strong> @ViewBag.WalletBalance.ToString("N0") VNĐ
+                                    <br>
+                                    <small class="text-muted">Số dư ví sẽ được tự động trừ vào đơn hàng</small>
+                                </div>
+                            }
+
+                            <!-- Phương thức thanh toán -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #2C3E50;">
+                                    <i class="fas fa-credit-card me-2 text-primary"></i>Chọn phương thức thanh toán
+                                </label>
+                                <div class="payment-methods">
+                                    <div class="form-check mb-3 p-3" style="border: 2px solid #E0E0E0; border-radius: 10px; transition: all 0.3s;" onmouseover="this.style.borderColor='#FF9500'" onmouseout="this.style.borderColor='#E0E0E0'">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="codPayment" value="COD" checked style="width: 20px; height: 20px;">
+                                        <label class="form-check-label ms-2" for="codPayment" style="cursor: pointer;">
+                                            <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                            <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                            <br>
+                                            <small class="text-muted">Thanh toán bằng tiền mặt khi nhận hàng</small>
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check p-3" style="border: 2px solid #E0E0E0; border-radius: 10px; transition: all 0.3s;" onmouseover="this.style.borderColor='#FF9500'" onmouseout="this.style.borderColor='#E0E0E0'">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="vnpayPayment" value="VNPay" style="width: 20px; height: 20px;">
+                                        <label class="form-check-label ms-2" for="vnpayPayment" style="cursor: pointer;">
+                                            <i class="fas fa-qrcode me-2 text-primary"></i>
+                                            <strong>Thanh toán qua VNPay</strong>
+                                            <br>
+                                            <small class="text-muted">Thanh toán trực tuyến qua cổng VNPay</small>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -92,6 +134,16 @@
                                 <h6 class="mb-0 fw-semibold" style="color: #2C3E50;"><i class="fa fa-truck me-2 text-info"></i>Phí vận chuyển:</h6>
                                 <p class="mb-0 fw-bold" style="color: #3498DB; font-size: 1.05rem;">@(shippingFee == 0 ? "Miễn phí" : shippingFee.ToString("N0") + " VNĐ")</p>
                             </div>
+
+                            @if (ViewBag.DiscountPercentage != null && ViewBag.DiscountPercentage > 0)
+                            {
+                                var subtotal = cartTotal + shippingFee;
+                                var discount = subtotal * (decimal)ViewBag.DiscountPercentage;
+                                <div class="d-flex justify-content-between mb-3">
+                                    <h6 class="mb-0 fw-semibold" style="color: #2C3E50;"><i class="fa fa-crown me-2" style="color: #FFD700;"></i>Giảm giá hạng thành viên:</h6>
+                                    <p class="mb-0 fw-bold" style="color: #E74C3C; font-size: 1.05rem;">-@discount.ToString("N0") VNĐ</p>
+                                </div>
+                            }
 
                             @if (cartTotal < 500000 && cartTotal > 0)
                             {

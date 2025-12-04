@@ -1,15 +1,6 @@
 @model ECommerceMVC.Models.Order
 @{
     ViewData["Title"] = "Chi tiết đơn hàng";
-    var statusText = Model.Status switch
-    {
-        "Pending" => "Chờ xác nhận",
-        "Preparing" => "Chuẩn bị món",
-        "Delivering" => "Đang giao",
-        "Delivered" => "Hoàn thành",
-        "Cancelled" => "Đã hủy",
-        _ => Model.Status
-    };
 }
 
 <!-- Single Page Header start -->
@@ -29,25 +20,25 @@
                     
                     <div class="d-flex justify-content-between align-items-center mb-4 position-relative">
                         <div class="flex-fill text-center">
-                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Pending" || Model.Status == "Preparing" || Model.Status == "Delivering" || Model.Status == "Delivered" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Chờ xác nhận" || Model.Status == "Chuẩn bị món" || Model.Status == "Đang giao" || Model.Status == "Hoàn thành" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
                                 <i class="fas fa-clock text-white fa-2x"></i>
                             </div>
                             <small class="fw-bold">Chờ xác nhận</small>
                         </div>
                         
-                        <div class="flex-fill" style="height: 3px; background-color: @(Model.Status == "Preparing" || Model.Status == "Delivering" || Model.Status == "Delivered" ? "#28a745" : "#dee2e6"); margin: 0 10px 30px;"></div>
+                        <div class="flex-fill" style="height: 3px; background-color: @(Model.Status == "Chuẩn bị món" || Model.Status == "Đang giao" || Model.Status == "Hoàn thành" ? "#28a745" : "#dee2e6"); margin: 0 10px 30px;"></div>
                         
                         <div class="flex-fill text-center">
-                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Preparing" || Model.Status == "Delivering" || Model.Status == "Delivered" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Chuẩn bị món" || Model.Status == "Đang giao" || Model.Status == "Hoàn thành" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
                                 <i class="fas fa-utensils text-white fa-2x"></i>
                             </div>
                             <small class="fw-bold">Chuẩn bị món</small>
                         </div>
                         
-                        <div class="flex-fill" style="height: 3px; background-color: @(Model.Status == "Delivering" || Model.Status == "Delivered" ? "#28a745" : "#dee2e6"); margin: 0 10px 30px;"></div>
+                        <div class="flex-fill" style="height: 3px; background-color: @(Model.Status == "Đang giao" || Model.Status == "Hoàn thành" ? "#28a745" : "#dee2e6"); margin: 0 10px 30px;"></div>
                         
                         <div class="flex-fill text-center">
-                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Delivering" || Model.Status == "Delivered" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
+                            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center @(Model.Status == "Đang giao" || Model.Status == "Hoàn thành" ? "bg-success" : "bg-secondary")" style="width: 60px; height: 60px;">
                                 <i class="fas fa-shipping-fast text-white fa-2x"></i>
                             </div>
                             <small class="fw-bold">Đang giao</small>
@@ -56,7 +47,7 @@
 
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        Trạng thái hiện tại: <strong>@statusText</strong>
+                        Trạng thái hiện tại: <strong>@Model.Status</strong>
                     </div>
                 </div>
 
@@ -77,7 +68,20 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col-6"><strong>Phương thức thanh toán:</strong></div>
-                        <div class="col-6">Thanh toán khi nhận hàng (COD)</div>
+                        <div class="col-6">
+                            @if (Model.Payment?.Method == "VNPay")
+                            {
+                                <span>VNPay</span>
+                            }
+                            else if (Model.Payment?.Method == "Wallet")
+                            {
+                                <span>Ví điện tử</span>
+                            }
+                            else
+                            {
+                                <span>Thanh toán khi nhận hàng (COD)</span>
+                            }
+                        </div>
                     </div>
                     @if (!string.IsNullOrEmpty(Model.Notes))
                     {
@@ -107,7 +111,7 @@
                 </div>
 
                 <div class="text-center mt-4">
-                    @if (Model.Status != "Cancelled")
+                    @if (Model.Status != "Huỷ đơn")
                     {
                         <a asp-action="ExportInvoice" asp-route-id="@Model.Id" class="btn btn-lg btn-success me-3" style="border: none; border-radius: 50px; padding: 12px 40px;">
                             <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn PDF

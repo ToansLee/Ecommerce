@@ -234,60 +234,58 @@
 		<!-- Pagination -->
 		@if (ViewBag.TotalPages > 1)
 		{
-			<div class="d-flex justify-content-between align-items-center mt-4">
-				<div>
-					<p style="color: #6C757D;">
-						Hiển thị <strong>@Model.Count</strong> trong tổng số <strong>@ViewBag.TotalItems</strong> món
-					</p>
+			<div class="mt-4">
+				<div class="d-flex justify-content-center gap-2">
+					@{
+						int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+						int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+					}
+
+					@* Nút về trang đầu *@
+					@if (ViewBag.CurrentPage > 1)
+					{
+						<a href="@Url.Action("MenuItems", new { 
+							page = 1, 
+							search = ViewBag.Search, 
+							categoryId = ViewBag.CategoryId, 
+							isAvailable = ViewBag.IsAvailable,
+							sortBy = ViewBag.SortBy
+						})" 
+						   class="btn btn-outline-secondary"
+						   style="min-width: 45px; border-radius: 8px;">
+							«
+						</a>
+					}
+
+					@for (int i = startPage; i <= endPage; i++)
+					{
+						<a href="@Url.Action("MenuItems", new { 
+							page = i, 
+							search = ViewBag.Search, 
+							categoryId = ViewBag.CategoryId, 
+							isAvailable = ViewBag.IsAvailable,
+							sortBy = ViewBag.SortBy 
+						})" class="btn @(i == ViewBag.CurrentPage ? "btn-success" : "btn-outline-secondary")"
+						   style="min-width: 45px; border-radius: 8px;">
+							@i
+						</a>
+					}
+
+					@if (endPage < ViewBag.TotalPages)
+					{
+						<span class="btn btn-outline-secondary" style="min-width: 45px; border-radius: 8px; pointer-events: none;">…</span>
+						<a href="@Url.Action("MenuItems", new { 
+							page = ViewBag.TotalPages, 
+							search = ViewBag.Search, 
+							categoryId = ViewBag.CategoryId, 
+							isAvailable = ViewBag.IsAvailable,
+							sortBy = ViewBag.SortBy 
+						})" class="btn btn-outline-secondary"
+						   style="min-width: 45px; border-radius: 8px;">
+							»
+						</a>
+					}
 				</div>
-				<nav>
-					<ul class="pagination mb-0">
-						@if (ViewBag.CurrentPage > 1)
-						{
-							<li class="page-item">
-								<a class="page-link" href="@Url.Action("MenuItems", new { 
-									page = ViewBag.CurrentPage - 1, 
-									search = ViewBag.Search, 
-									categoryId = ViewBag.CategoryId, 
-									isAvailable = ViewBag.IsAvailable,
-									sortBy = ViewBag.SortBy 
-								})" style="border-radius: 8px 0 0 8px; border-color: #FFE5CC; color: #FF9500;">
-									<i class="fas fa-chevron-left"></i>
-								</a>
-							</li>
-						}
-
-						@for (int i = 1; i <= ViewBag.TotalPages; i++)
-						{
-							<li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-								<a class="page-link" href="@Url.Action("MenuItems", new { 
-									page = i, 
-									search = ViewBag.Search, 
-									categoryId = ViewBag.CategoryId, 
-									isAvailable = ViewBag.IsAvailable,
-									sortBy = ViewBag.SortBy 
-								})" style="border-color: #FFE5CC; @(i == ViewBag.CurrentPage ? "background-color: #FF9500; border-color: #FF9500; color: white;" : "color: #FF9500;")">
-									@i
-								</a>
-							</li>
-						}
-
-						@if (ViewBag.CurrentPage < ViewBag.TotalPages)
-						{
-							<li class="page-item">
-								<a class="page-link" href="@Url.Action("MenuItems", new { 
-									page = ViewBag.CurrentPage + 1, 
-									search = ViewBag.Search, 
-									categoryId = ViewBag.CategoryId, 
-									isAvailable = ViewBag.IsAvailable,
-									sortBy = ViewBag.SortBy 
-								})" style="border-radius: 0 8px 8px 0; border-color: #FFE5CC; color: #FF9500;">
-									<i class="fas fa-chevron-right"></i>
-								</a>
-							</li>
-						}
-					</ul>
-				</nav>
 			</div>
 		}
 	</div>

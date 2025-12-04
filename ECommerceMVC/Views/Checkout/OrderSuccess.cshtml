@@ -43,12 +43,32 @@
                         </div>
                         <div class="row mb-3 pb-3" style="border-bottom: 2px dashed #E0E0E0;">
                             <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-credit-card me-2 text-primary"></i>Phương thức thanh toán:</strong></div>
-                            <div class="col-6 fw-semibold">Thanh toán khi nhận hàng (COD)</div>
+                            <div class="col-6 fw-semibold">
+                                @if (Model.Payment?.Method == "VNPay")
+                                {
+                                    <span>VNPay</span>
+                                }
+                                else if (Model.Payment?.Method == "Wallet")
+                                {
+                                    <span>Ví điện tử</span>
+                                }
+                                else
+                                {
+                                    <span>Thanh toán khi nhận hàng (COD)</span>
+                                }
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-6"><strong style="color: #2C3E50;"><i class="fa fa-check-circle me-2 text-warning"></i>Trạng thái thanh toán:</strong></div>
                             <div class="col-6">
-                                <span class="badge" style="background-color: #FFA726; font-size: 0.9rem; padding: 8px 15px;">Thanh toán khi nhận hàng</span>
+                                @if (Model.Payment?.Status == "Completed")
+                                {
+                                    <span class="badge" style="background-color: #28a745; font-size: 0.9rem; padding: 8px 15px;">Đã thanh toán</span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="background-color: #FFA726; font-size: 0.9rem; padding: 8px 15px;">Thanh toán khi nhận hàng</span>
+                                }
                             </div>
                         </div>
                     </div>

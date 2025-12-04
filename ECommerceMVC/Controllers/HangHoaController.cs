@@ -23,7 +23,10 @@ namespace ECommerceMVC.Controllers
                 return RedirectToAction("Index", "Seller");
             }
             int pageSize = 9;
-            var menuItems = db.MenuItems.Include(m => m.Category).AsQueryable();
+            var menuItems = db.MenuItems
+                .Include(m => m.Category)
+                .Where(m => m.IsAvailable)
+                .AsQueryable();
 
             if (loai.HasValue)
             {
@@ -32,11 +35,11 @@ namespace ECommerceMVC.Controllers
 
             if (minPrice.HasValue)
             {
-                menuItems = menuItems.Where(p => p.Price >= minPrice.Value);
+                menuItems = menuItems.Where(p => p.Price >= (decimal)minPrice.Value);
             }
             if (maxPrice.HasValue)
             {
-                menuItems = menuItems.Where(p => p.Price <= maxPrice.Value);
+                menuItems = menuItems.Where(p => p.Price <= (decimal)maxPrice.Value);
             }
 
 
@@ -57,7 +60,7 @@ namespace ECommerceMVC.Controllers
                 {
                     MaHh = p.Id,
                     TenHH = p.Name,
-                    DonGia = p.Price,
+                    DonGia = (double)p.Price,
                     Hinh = p.Image ?? "",
                     MoTaNgan = p.Description ?? "",
                     TenLoai = p.Category != null ? p.Category.Name : ""
@@ -86,7 +89,10 @@ namespace ECommerceMVC.Controllers
                 return RedirectToAction("Index", "Seller");
             }
 
-            var menuItems = db.MenuItems.Include(m => m.Category).AsQueryable();
+            var menuItems = db.MenuItems
+                .Include(m => m.Category)
+                .Where(m => m.IsAvailable)
+                .AsQueryable();
             if (query != null)
             {
                 menuItems = menuItems.Where(p => p.Name.Contains(query));
@@ -96,7 +102,7 @@ namespace ECommerceMVC.Controllers
             {
                 MaHh = p.Id,
                 TenHH = p.Name,
-                DonGia = p.Price,
+                DonGia = (double)p.Price,
                 Hinh = p.Image ?? "",
                 MoTaNgan = p.Description ?? "",
                 TenLoai = p.Category != null ? p.Category.Name : ""
@@ -116,23 +122,23 @@ namespace ECommerceMVC.Controllers
             var data = db.MenuItems
                 .Include(p => p.Category)
                 .SingleOrDefault(p => p.Id == id);
-            if (data == null)
+            if (data == null || !data.IsAvailable)
             {
-                TempData["Message"] = $"Không thấy sản phẩm có mã {id}";
+                TempData["Message"] = $"Sản phẩm không khả dụng hoặc đã hết hàng";
                 return Redirect("/404");
             }
 
-            // L?y 4 s?n ph?m ng?u nhi�n, kh�ng bao g?m s?n ph?m hi?n t?i
+            // Lấy 4 sản phẩm ngẫu nhiên, không bao gồm sản phẩm hiện tại
             var relatedProducts = db.MenuItems
                 .Include(p => p.Category)
-                .Where(p => p.Id != id)
+                .Where(p => p.Id != id && p.IsAvailable)
                 .OrderBy(x => Guid.NewGuid())
                 .Take(4)
                 .Select(p => new HangHoaVM
                 {
                     MaHh = p.Id,
                     TenHH = p.Name,
-                    DonGia = p.Price,
+                    DonGia = (double)p.Price,
                     Hinh = p.Image ?? "",
                     MoTaNgan = p.Description ?? "",
                     TenLoai = p.Category != null ? p.Category.Name : ""
@@ -143,7 +149,7 @@ namespace ECommerceMVC.Controllers
             {
                 MaHh = data.Id,
                 TenHH = data.Name,
-                DonGia = data.Price,
+                DonGia = (double)data.Price,
                 ChiTiet = data.Description ?? string.Empty,
                 Hinh = data.Image ?? string.Empty,
                 MoTaNgan = data.Description ?? string.Empty,

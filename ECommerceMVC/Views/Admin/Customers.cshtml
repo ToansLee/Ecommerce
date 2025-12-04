@@ -151,18 +151,50 @@
                         @if (ViewBag.TotalPages > 1)
                         {
                             <div class="card-footer bg-white">
-                                <nav>
-                                    <ul class="pagination justify-content-center mb-0">
-                                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                                        {
-                                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                                <a class="page-link" asp-action="Customers" asp-route-page="@i" asp-route-searchString="@ViewBag.SearchString" asp-route-status="@ViewBag.Status">
-                                                    @i
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </nav>
+                                <div class="d-flex justify-content-center gap-2">
+                                    @{
+                                        int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+                                        int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+                                    }
+
+                                    @* Nút về trang đầu *@
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <a asp-action="Customers" 
+                                           asp-route-page="1" 
+                                           asp-route-searchString="@ViewBag.SearchString" 
+                                           asp-route-status="@ViewBag.Status"
+                                           class="btn btn-outline-secondary"
+                                           style="min-width: 45px; border-radius: 8px;">
+                                            «
+                                        </a>
+                                    }
+
+                                    @for (int i = startPage; i <= endPage; i++)
+                                    {
+                                        <a asp-action="Customers" 
+                                           asp-route-page="@i" 
+                                           asp-route-searchString="@ViewBag.SearchString" 
+                                           asp-route-status="@ViewBag.Status"
+                                           class="btn @(i == ViewBag.CurrentPage ? "btn-success" : "btn-outline-secondary")"
+                                           style="min-width: 45px; border-radius: 8px;">
+                                            @i
+                                        </a>
+                                    }
+
+                                    @if (endPage < ViewBag.TotalPages)
+                                    {
+                                        <span class="btn btn-outline-secondary" style="min-width: 45px; border-radius: 8px; pointer-events: none;">…</span>
+                                        <a asp-action="Customers" 
+                                           asp-route-page="@ViewBag.TotalPages" 
+                                           asp-route-searchString="@ViewBag.SearchString" 
+                                           asp-route-status="@ViewBag.Status"
+                                           class="btn btn-outline-secondary"
+                                           style="min-width: 45px; border-radius: 8px;">
+                                            »
+                                        </a>
+                                    }
+                                </div>
                             </div>
                         }
                     }

@@ -11,6 +11,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<FoodChatbotService>();
+builder.Services.AddScoped<VNPayService>();
+builder.Services.AddScoped<InvoiceService>();
+builder.Services.AddScoped<CustomerTierService>();
 builder.Services.AddDbContext<ECommerceMVC.Data.FoodOrderingContext>(options => {
 	options.UseSqlServer(builder.Configuration.GetConnectionString("FoodOrdering"));
 });

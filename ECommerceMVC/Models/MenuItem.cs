@@ -14,16 +14,15 @@ namespace ECommerceMVC.Models
         
         public string? Description { get; set; }
         
-        [Required]
-        public double Price { get; set; }
-        
-        [ForeignKey(nameof(Category))]
+    [Required]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Price { get; set; }        [ForeignKey(nameof(Category))]
         public int? CategoryId { get; set; }
         public MenuCategory? Category { get; set; }
         
         public string? Image { get; set; }
         public bool IsAvailable { get; set; } = true;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
         
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
